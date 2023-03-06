@@ -33,6 +33,14 @@ export interface IUserService {
     email: string;
     phoneNumber: string;
   }): Promise<UserModelInterface>;
+
+  updatePassword(
+    userId: string | Types.ObjectId,
+    password: string,
+    actor: string
+  ): Promise<UserModelInterface>;
+
+  getUserById(userId: string): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

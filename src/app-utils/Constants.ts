@@ -30,7 +30,7 @@ const CONSTANTS = {
       message: "Email, username or phone number already in use",
     },
 
-    USER_NOT_EXISTED: {
+    USER_NOT_EXIST: {
       errorCode: "02",
       message: "User not existed",
     },
@@ -50,6 +50,11 @@ const CONSTANTS = {
       message: "Internal email server error, email not sent",
     },
 
+    WRONG_PASSWORD: {
+      errorCode: "06",
+      message: "Wrong password",
+    },
+
     UNKNOWN_DATA: {
       errorCode: "010",
       message: "Unknown parameters passed",
@@ -64,6 +69,8 @@ const CONSTANTS = {
     PASSWORD_NOT_VALID: "Password invalid",
 
     CONFIRM_PASSWORD_DIFFERENT: "Confirm password not the same",
+
+    OBJECTID_INVALID: "Not a valid ObjectId",
   },
 };
 

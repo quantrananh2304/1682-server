@@ -30,7 +30,7 @@ class AuthenticationController {
         });
 
       if (!user) {
-        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXISTED);
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
       }
 
       if (user.status === USER_STATUS.LOCKED) {
@@ -60,6 +60,7 @@ class AuthenticationController {
       return res.successRes({
         data: {
           token,
+          _id: user._id,
           firstName: user.firstName,
           lastName: user.lastName,
           avatar: user.avatar,

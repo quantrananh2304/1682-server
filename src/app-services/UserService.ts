@@ -8,6 +8,7 @@ import { IUserService } from "./interface";
 import { injectable } from "inversify";
 import bcrypt = require("bcryptjs");
 import CONSTANTS from "@app-utils/Constants";
+import { Types } from "mongoose";
 
 @injectable()
 class UserService implements IUserService {
@@ -72,6 +73,36 @@ class UserService implements IUserService {
     const user: UserModelInterface = await Users.findOne({
       $or: [{ username }, { email }, { phoneNumber }],
     });
+
+    return user;
+  }
+
+  async updatePassword(
+    userId: string,
+    password: string,
+    actor: string
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          password,
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return user;
+  }
+
+  async getUserById(userId: string): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findById(
+      Types.ObjectId(userId)
+    )
+      .select("-__v")
+      .lean();
 
     return user;
   }

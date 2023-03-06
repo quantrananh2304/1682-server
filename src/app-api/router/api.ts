@@ -23,6 +23,14 @@ router.post(
   UserControllerInstance.register.bind(UserControllerInstance)
 );
 
+router.put(
+  "/user/:userId/change-password",
+  UserMiddleware.changePassword,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  UserControllerInstance.changePassword.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",
