@@ -9,7 +9,7 @@ export type SuccessParamType = {
 };
 
 export type ErrorResParamType = {
-  errorCode?: number;
+  errorCode?: string;
   message?: string;
   data?: any;
   errors?: Array<any>;

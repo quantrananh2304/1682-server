@@ -1,6 +1,5 @@
 import { Schema, Types, model } from "mongoose";
 import { BaseModelInterface } from "./BaseModelInterface";
-import { USER_COLLECTION_NAME } from "./Users";
 
 export const TOPIC_COLLECTION_NAME = "topics";
 
@@ -36,7 +35,7 @@ const topicSchema = new Schema({
 
   updatedBy: {
     type: Types.ObjectId && String,
-    ref: USER_COLLECTION_NAME,
+    ref: "users",
   },
 });
 

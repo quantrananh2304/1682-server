@@ -1,7 +1,7 @@
 import { Schema, Types, model } from "mongoose";
 import { BaseModelInterface } from "./BaseModelInterface";
-import { USER_COLLECTION_NAME, UserModelInterface } from "./Users";
 import { TOPIC_COLLECTION_NAME } from "./Topics";
+import { UserModelInterface } from "./Users";
 
 export const BOOK_COLLECTION_NAME = "books";
 
@@ -66,7 +66,7 @@ const bookSchema = new Schema({
       {
         user: {
           type: Types.ObjectId,
-          ref: USER_COLLECTION_NAME,
+          ref: "users",
         },
         createdAt: Date,
       },
@@ -80,7 +80,7 @@ const bookSchema = new Schema({
       {
         user: {
           type: Types.ObjectId,
-          ref: USER_COLLECTION_NAME,
+          ref: "users",
         },
         createdAt: Date,
       },
@@ -94,7 +94,7 @@ const bookSchema = new Schema({
       {
         user: {
           type: Types.ObjectId,
-          ref: USER_COLLECTION_NAME,
+          ref: "users",
         },
         createdAt: Date,
       },
@@ -110,7 +110,7 @@ const bookSchema = new Schema({
         createdAt: Date,
         createdBy: {
           type: Types.ObjectId,
-          ref: USER_COLLECTION_NAME,
+          ref: "users",
         },
         editHistory: {
           type: [
@@ -141,7 +141,7 @@ const bookSchema = new Schema({
       {
         user: {
           type: Types.ObjectId,
-          ref: USER_COLLECTION_NAME,
+          ref: "users",
         },
         createdAt: Date,
       },
@@ -168,7 +168,7 @@ const bookSchema = new Schema({
   },
   updatedBy: {
     type: Types.ObjectId && String,
-    ref: USER_COLLECTION_NAME,
+    ref: "users",
   },
 });
 

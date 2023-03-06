@@ -7,13 +7,13 @@ import {
   UnauthorizedRequestParamType,
   InternalRequestParamType,
 } from "../http.extends";
-import MessageErrors from "@app-common/ErrorMessage";
+import CONSTANTS from "@app-utils/Constants";
 
 const httpResponse = (req: RequestEX, res: Response, next) => {
   res.successRes = function ({
     data = {},
     errorCode = 0,
-    message = MessageErrors.server.success,
+    message = CONSTANTS.SUCCESS,
   }) {
     //discordLogger(req as any, "success");
     return res.json({
@@ -30,8 +30,8 @@ const httpResponse = (req: RequestEX, res: Response, next) => {
     data,
     errors,
   }: ErrorResParamType = {}) {
-    errorCode = errorCode || -1;
-    message = message || MessageErrors.server.error;
+    errorCode = errorCode || "-1";
+    message = message || CONSTANTS.ERROR;
     data = data || {};
     errors = errors || [];
 
@@ -44,27 +44,27 @@ const httpResponse = (req: RequestEX, res: Response, next) => {
   };
 
   res.badRequest = function ({
-    message = MessageErrors.server.badRequest,
+    message = CONSTANTS.BAD_REQUEST,
   }: BadRequestParamType = {}) {
-    return res.status(400).errorRes({ errorCode: 400, message: message });
+    return res.status(400).errorRes({ errorCode: "400", message: message });
   };
 
   res.forbidden = function ({
-    message = MessageErrors.server.forbidden,
+    message = CONSTANTS.FORBIDDEN,
   }: ForbiddenRequestParamType = {}) {
-    return res.status(403).errorRes({ errorCode: 403, message: message });
+    return res.status(403).errorRes({ errorCode: "403", message: message });
   };
 
   res.unauthorize = function ({
-    message = MessageErrors.server.unauthorize,
+    message = CONSTANTS.UNAUTHORIZED,
   }: UnauthorizedRequestParamType = {}) {
-    return res.status(401).errorRes({ errorCode: 401, message: message });
+    return res.status(401).errorRes({ errorCode: "401", message: message });
   };
 
   res.internal = function ({
-    message = MessageErrors.server.internal,
+    message = CONSTANTS.INTERNAL_ERROR,
   }: InternalRequestParamType = {}) {
-    return res.status(500).errorRes({ errorCode: 500, message: message });
+    return res.status(500).errorRes({ errorCode: "500", message: message });
   };
 
   next();
