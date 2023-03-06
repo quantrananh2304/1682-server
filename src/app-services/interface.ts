@@ -27,6 +27,12 @@ export interface IUserService {
     email: string;
     phoneNumber: string;
   }): Promise<boolean>;
+
+  getUserByEmailUsernamePhoneNumber(_user: {
+    username: string;
+    email: string;
+    phoneNumber: string;
+  }): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

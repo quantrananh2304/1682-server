@@ -1,8 +1,7 @@
 import { Schema, Types, model } from "mongoose";
-import { USER_COLLECTION_NAME } from "./Users";
 import { BaseModelInterface } from "./BaseModelInterface";
 
-export const EVENT_COLLECTION_NAME = "Events";
+export const EVENT_COLLECTION_NAME = "events";
 
 export enum EVENT_SCHEMA {
   USER = "USER",
@@ -38,7 +37,7 @@ const eventSchema = new Schema({
   },
   actor: {
     type: String && Types.ObjectId,
-    ref: USER_COLLECTION_NAME,
+    ref: "users",
     default: null,
   },
   description: {
@@ -46,7 +45,7 @@ const eventSchema = new Schema({
     required: true,
     default: "",
   },
-  createAt: {
+  createdAt: {
     type: Date,
     required: true,
     default: new Date(),

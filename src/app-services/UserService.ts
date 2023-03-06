@@ -61,6 +61,20 @@ class UserService implements IUserService {
 
     return false;
   }
+
+  async getUserByEmailUsernamePhoneNumber(_user: {
+    username: string;
+    email: string;
+    phoneNumber: string;
+  }): Promise<UserModelInterface> {
+    const { username, email, phoneNumber } = _user;
+
+    const user: UserModelInterface = await Users.findOne({
+      $or: [{ username }, { email }, { phoneNumber }],
+    });
+
+    return user;
+  }
 }
 
 export default UserService;

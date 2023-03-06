@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import { IEventService } from "./interface";
-import Event, {
+import Events, {
   EVENT_ACTION,
   EVENT_SCHEMA,
   EventModelInterface,
@@ -12,15 +12,15 @@ class EventService implements IEventService {
   async createEvent(_event: {
     schema: EVENT_SCHEMA;
     action: EVENT_ACTION;
-    schemaId: string | Types.ObjectId;
-    actor: string | Types.ObjectId;
+    schemaId: string;
+    actor: string;
     description: string;
   }): Promise<EventModelInterface> {
-    const event = await Event.create({
+    const event = await Events.create({
       schema: _event.schema,
       action: _event.action,
-      schemaId: _event.schemaId,
-      actor: _event.actor,
+      schemaId: Types.ObjectId(_event.schemaId),
+      actor: Types.ObjectId(_event.actor),
       description: _event.description,
       createdAt: new Date(),
     });

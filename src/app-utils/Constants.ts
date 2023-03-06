@@ -30,6 +30,21 @@ const CONSTANTS = {
       message: "Email, username or phone number already in use",
     },
 
+    USER_NOT_EXISTED: {
+      errorCode: "02",
+      message: "User not existed",
+    },
+
+    ACCOUNT_LOCKED: {
+      errorCode: "03",
+      message: "Account locked",
+    },
+
+    LOGIN_INFO_INVALID: {
+      errorCode: "04",
+      message: "Wrong username or password",
+    },
+
     INTERNAL_EMAIL_ERROR: {
       errorCode: "05",
       message: "Internal email server error, email not sent",

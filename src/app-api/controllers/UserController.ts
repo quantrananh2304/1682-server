@@ -56,16 +56,15 @@ class UserController {
         username
       );
 
-      await Promise.allSettled([
-        this.eventService.createEvent({
-          schema: EVENT_SCHEMA.USER,
-          action: EVENT_ACTION.CREATE,
-          schemaId: user._id,
-          actor: user._id,
-          description: "/user/register",
-        }),
-        this.nodeMailer.nodeMailerSendMail([email], title, body),
-      ]);
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.CREATE,
+        schemaId: String(user._id),
+        actor: String(user._id),
+        description: "/user/register",
+      });
+
+      await this.nodeMailer.nodeMailerSendMail([email], title, body);
 
       return res.successRes({ data: {} });
     } catch (error) {
