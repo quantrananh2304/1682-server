@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "alwaysStrict": false,
+    "module": "commonjs",
+    "types": [
+      "reflect-metadata"
+    ],
+    "target": "es6",
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "strictNullChecks": false,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "removeComments": true,
+    "allowJs": true,
+    "lib": [
+      "es6",
+      "dom"
+    ],
+    "plugins": [
+      {
+        "transform": "@zerollup/ts-transform-paths"
+      }
+    ],
+    "paths": {
+      "@*": [
+        "src/*"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ]
+}

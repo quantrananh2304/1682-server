@@ -1,0 +1,89 @@
+{
+  "name": "ONEMOREPAGE",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "prettier:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "prettier:format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "lint:check": "npx eslint \"src/**/*.{ts,tsx}\"",
+    "build": "tsc && tsc-alias",
+    "serve": "ts-node -C ttypescript src/index.ts",
+    "watch": "ts-node-dev -C ttypescript src/index.ts",
+    "dev": "NODE_ENV=development ts-node-dev -C ttypescript src/index.ts",
+    "dev-windows": "yarn install&& SET NODE_ENV=development&& ts-node -C ttypescript src/index.ts",
+    "staging": "NODE_ENV=staging ts-node -C ttypescript src/index.ts",
+    "staging-windows": "yarn install&& SET NODE_ENV=staging&& ts-node -C ttypescript src/index.ts",
+    "production": "NODE_ENV=production ts-node -C ttypescript src/index.ts",
+    "production-windows": "yarn install&& SET NODE_ENV=production&& ts-node -C ttypescript src/index.ts"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "atob": "^2.1.2",
+    "axios": "^0.27.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^10.0.0",
+    "escape-string-regexp": "2.0.0",
+    "express": "^4.17.1",
+    "express-list-endpoints": "^6.0.0",
+    "express-validator": "^6.13.0",
+    "helmet": "^4.6.0",
+    "inversify": "^6.0.1",
+    "inversify-inject-decorators": "^3.1.0",
+    "jsdom": "^20.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^3.1.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
+    "mongodb": "^4.4.0",
+    "mongoose": "5.13.13",
+    "mongoose-unique-validator": "^3.1.0",
+    "multer": "^1.4.3",
+    "multer-s3": "^3.0.1",
+    "node-cron": "^3.0.1",
+    "node-schedule": "^2.1.0",
+    "nodemailer": "^6.7.3",
+    "querystring": "^0.2.1",
+    "reflect-metadata": "^0.1.13",
+    "request": "^2.88.2",
+    "safe-regex": "2.0.2",
+    "ts-node": "^10.1.0",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "4.3.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.10",
+    "@types/express": "^4.17.12",
+    "@types/lodash": "^4.14.173",
+    "@types/mongoose": "^5.11.97",
+    "@types/multer": "^1.4.7",
+    "@types/node": "16.18.12",
+    "@types/safe-regex": "^1.1.2",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
+    "@zerollup/ts-transform-paths": "^1.7.18",
+    "eslint": "^8.14.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.4.1",
+    "nodemon": "^2.0.15",
+    "prettier": "2.6.2",
+    "tsc-alias": "^1.3.7",
+    "ttypescript": "^1.5.12"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": "prettier --write"
+  }
+}
