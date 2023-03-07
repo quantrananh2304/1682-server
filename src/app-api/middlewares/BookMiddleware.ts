@@ -1,8 +1,9 @@
-import { body, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import { isValidObjectId } from "mongoose";
 import _ = require("lodash");
 import CONSTANTS from "@app-utils/Constants";
 import { GET_LIST_BOOK_SORT } from "@app-services/interface";
+import { isBefore } from "date-fns";
 
 const BookMiddleware = {
   create: [
@@ -47,6 +48,23 @@ const BookMiddleware = {
         return true;
       })
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.SORT_OPTION_INVALID),
+  ],
+
+  hide: [
+    param("bookId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .custom((bookId: string) => isValidObjectId(bookId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("hiddenUntil")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom(
+        (hiddenUntil: string) =>
+          !isNaN(Date.parse(hiddenUntil)) &&
+          isBefore(new Date(), new Date(hiddenUntil))
+      )
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.DATE_FORMAT_NOT_VALID),
   ],
 };
 

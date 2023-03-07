@@ -2,6 +2,7 @@ import { Request, Response } from "@app-helpers/http.extends";
 import { BookModelInterface } from "@app-repositories/models/Books";
 import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
 import { TopicModelInterface } from "@app-repositories/models/Topics";
+import { USER_ROLE } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import BookService from "@app-services/BookService";
 import EventService from "@app-services/EventService";
@@ -85,6 +86,51 @@ class BookController {
       });
 
       return res.successRes({ data: book });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  async hideBook(req: Request, res: Response) {
+    try {
+      const { bookId } = req.params;
+      const { hiddenUntil } = req.body;
+      const { userId, userRole } = req.headers;
+
+      const book: BookModelInterface = await this.bookService.getBookById(
+        bookId
+      );
+
+      if (!book) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_NOT_EXIST);
+      }
+
+      const { createdBy } = book;
+
+      if (userRole !== USER_ROLE.ADMIN && userId !== String(createdBy)) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.CANNOT_UPDATE_OTHER_BOOK);
+      }
+
+      const data: BookModelInterface = await this.bookService.hideBook(
+        bookId,
+        hiddenUntil,
+        userId
+      );
+
+      if (!data) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.BOOK,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: String(data._id),
+        actor: userId,
+        description: "/book/hide",
+      });
+
+      return res.successRes({ data });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });

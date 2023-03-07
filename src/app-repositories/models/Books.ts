@@ -151,8 +151,12 @@ const bookSchema = new Schema({
   },
 
   hidden: {
-    type: Boolean,
-    default: false,
+    type: {
+      isHidden: Boolean,
+      hiddenBy: Types.ObjectId,
+      hiddenUntil: Date,
+    },
+    default: { isHidden: false, hiddenBy: null, hiddenUntil: null },
     required: true,
   },
 
@@ -167,6 +171,10 @@ const bookSchema = new Schema({
     default: new Date(),
   },
   updatedBy: {
+    type: Types.ObjectId,
+    ref: "users",
+  },
+  createdBy: {
     type: Types.ObjectId,
     ref: "users",
   },

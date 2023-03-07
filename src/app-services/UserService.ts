@@ -41,6 +41,7 @@ class UserService implements IUserService {
       favorites: [],
       following: [],
       followers: [],
+      warning: [],
     });
 
     return user;

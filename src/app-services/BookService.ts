@@ -27,6 +27,7 @@ class BookService implements IBookService {
       createdAt: new Date(),
       updatedAt: new Date(),
       updatedBy: Types.ObjectId(actor),
+      createdBy: Types.ObjectId(actor),
     });
 
     return book;
@@ -131,7 +132,7 @@ class BookService implements IBookService {
       {
         $match: {
           title: { $regex: keyword, $options: "i" },
-          hidden: false,
+          "hidden.isHidden": false,
         },
       },
 
@@ -520,6 +521,30 @@ class BookService implements IBookService {
       totalPage:
         total % limit === 0 ? total / limit : Math.floor(total / limit) + 1,
     };
+  }
+
+  async hideBook(
+    _id: string,
+    hiddenUntil: string,
+    actor: string
+  ): Promise<BookModelInterface> {
+    const book: BookModelInterface = await Books.findByIdAndUpdate(
+      _id,
+      {
+        $set: {
+          hidden: {
+            isHidden: true,
+            hiddenBy: Types.ObjectId(actor),
+            hiddenUntil: new Date(hiddenUntil),
+          },
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return book;
   }
 }
 

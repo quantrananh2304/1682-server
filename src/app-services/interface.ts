@@ -177,4 +177,10 @@ export interface IBookService {
     total: number;
     totalPage: number;
   }>;
+
+  hideBook(
+    _id: string,
+    hiddenUntil: string,
+    actor: string
+  ): Promise<BookModelInterface>;
 }

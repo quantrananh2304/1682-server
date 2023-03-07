@@ -57,6 +57,10 @@ async function checkAuthor(req: Request, res: Response, next: NextFunction) {
       if (payload) {
         const { userRole } = payload;
 
+        if (USER_ROLE[userRole] === USER_ROLE.ADMIN) {
+          next();
+        }
+
         if (USER_ROLE[userRole] === USER_ROLE.AUTHOR) {
           next();
         } else {

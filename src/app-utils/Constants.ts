@@ -97,6 +97,16 @@ const CONSTANTS = {
       message: "Author only",
     },
 
+    BOOK_NOT_EXIST: {
+      errorCode: "015",
+      message: "Book not exist",
+    },
+
+    CANNOT_UPDATE_OTHER_BOOK: {
+      errorCode: "016",
+      message: "Cannot update others' book",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

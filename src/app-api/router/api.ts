@@ -123,4 +123,14 @@ router.get(
   BookControllerInstance.getListBook.bind(BookControllerInstance)
 );
 
+router.put(
+  "/author/book/:bookId/hide",
+  BookMiddleware.hide,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAuthor,
+  BookControllerInstance.hideBook.bind(BookControllerInstance)
+);
+
 export default router;
