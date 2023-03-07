@@ -81,6 +81,28 @@ class TopicService implements ITopicService {
         total % limit === 0 ? total / limit : Math.floor(total / limit) + 1,
     };
   }
+
+  async updateTopic(
+    _topic: { name: string; note: string; _id: string },
+    actor: string
+  ): Promise<TopicModelInterface> {
+    const { name, note, _id } = _topic;
+
+    const topic: TopicModelInterface = await Topics.findByIdAndUpdate(
+      _id,
+      {
+        $set: {
+          name,
+          note,
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return topic;
+  }
 }
 
 export default TopicService;

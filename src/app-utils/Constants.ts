@@ -87,6 +87,11 @@ const CONSTANTS = {
       message: "Topic already existed",
     },
 
+    TOPIC_NOT_EXIST: {
+      errorCode: "013",
+      message: "Topic not exist",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

@@ -77,6 +77,31 @@ class TopicController {
       return res.internal({ message: error.errorMessage });
     }
   }
+
+  async updateTopic(req: Request, res: Response) {
+    try {
+      const { topicId } = req.params;
+      const { name, note } = req.body;
+
+      const topic: TopicModelInterface = await this.topicService.updateTopic(
+        {
+          name,
+          note,
+          _id: topicId,
+        },
+        req.headers.userId
+      );
+
+      if (!topic) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.TOPIC_NOT_EXIST);
+      }
+
+      return res.successRes({ data: topic });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
 }
 
 export default TopicController;

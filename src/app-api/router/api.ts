@@ -90,4 +90,14 @@ router.get(
   TopicControllerInstance.getListTopic.bind(TopicControllerInstance)
 );
 
+router.put(
+  "/admin/topic/:topicId/update",
+  TopicMiddleware.updateTopic,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAdmin,
+  TopicControllerInstance.updateTopic.bind(TopicControllerInstance)
+);
+
 export default router;

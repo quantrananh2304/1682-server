@@ -125,4 +125,9 @@ export interface ITopicService {
     total: number;
     totalPage: number;
   }>;
+
+  updateTopic(
+    _topic: { name: string; note: string; _id: string },
+    actor: string
+  ): Promise<TopicModelInterface>;
 }
