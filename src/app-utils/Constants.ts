@@ -82,6 +82,11 @@ const CONSTANTS = {
       message: "Required admin permission",
     },
 
+    TOPIC_EXISTED: {
+      errorCode: "012",
+      message: "Topic already existed",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

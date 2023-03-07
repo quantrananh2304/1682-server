@@ -18,6 +18,7 @@ async function checkToken(req: Request, res: Response, next: NextFunction) {
         if (err.name === "TokenExpiredError") {
           return res.forbidden(CONSTANTS.SERVER_ERROR.AUTHORIZATION_FORBIDDEN);
         }
+
         return res.unauthorize({
           message: CONSTANTS.SERVER_ERROR.AUTHORIZATION_UNAUTHORIZED.message,
         });

@@ -3,6 +3,7 @@ import {
   EVENT_SCHEMA,
   EventModelInterface,
 } from "@app-repositories/models/Events";
+import { TopicModelInterface } from "@app-repositories/models/Topics";
 import {
   USER_GENDER,
   UserModelInterface,
@@ -93,4 +94,16 @@ export interface IEventService {
     actor: string | Types.ObjectId;
     description: string;
   }): Promise<EventModelInterface>;
+}
+
+export interface ITopicService {
+  createTopic(
+    _topic: {
+      name: string;
+      note: string;
+    },
+    actor: string
+  ): Promise<TopicModelInterface>;
+
+  getTopicByName(name: string): Promise<TopicModelInterface>;
 }

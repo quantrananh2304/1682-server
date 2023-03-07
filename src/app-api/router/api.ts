@@ -1,8 +1,10 @@
 import AuthenticationController from "@app-api/controllers/AuthenticationController";
+import TopicController from "@app-api/controllers/TopicController";
 import UserController from "@app-api/controllers/UserController";
 import AuthenticationMiddleware from "@app-api/middlewares/AuthenticationMiddleware";
 import ParamsValidations from "@app-api/middlewares/ParamsValidation";
 import TokenValidation from "@app-api/middlewares/Token";
+import TopicMiddleware from "@app-api/middlewares/TopicMiddleware";
 import UserMiddleware from "@app-api/middlewares/UserMiddleware";
 import container from "@app-repositories/ioc";
 import express = require("express");
@@ -12,6 +14,7 @@ const router = express.Router();
 const UserControllerInstance = container.get<UserController>(UserController);
 const AuthenticationControllerInstance =
   container.get<AuthenticationController>(AuthenticationController);
+const TopicControllerInstance = container.get<TopicController>(TopicController);
 
 router.get("/test", (req, res) => res.send({ status: "OK" }));
 
@@ -65,6 +68,17 @@ router.post(
   ParamsValidations.validationRequest,
   ParamsValidations.preventUnknownData,
   AuthenticationControllerInstance.login.bind(AuthenticationControllerInstance)
+);
+
+//topic
+router.post(
+  "/admin/topic/create",
+  TopicMiddleware.create,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAdmin,
+  TopicControllerInstance.createTopic.bind(TopicControllerInstance)
 );
 
 export default router;

@@ -18,7 +18,6 @@ const topicSchema = new Schema({
   note: {
     type: String,
     default: "",
-    required: true,
   },
 
   createdAt: {
