@@ -7,6 +7,8 @@ import UserService from "@app-services/UserService";
 import CONSTANTS from "@app-utils/Constants";
 import { inject, injectable } from "inversify";
 import bcrypt = require("bcryptjs");
+import jwt = require("jsonwebtoken");
+import { RANDOM_TOKEN_SECRET } from "@app-configs";
 
 @injectable()
 class UserController {
@@ -114,6 +116,115 @@ class UserController {
       });
 
       return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async requestResetPasswordCode(req: Request, res: Response) {
+    try {
+      const { email } = req.params;
+
+      const user: UserModelInterface =
+        await this.userService.getUserByEmailUsernamePhoneNumber({
+          username: "",
+          email,
+          phoneNumber: "",
+        });
+
+      if (!user) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      const { _id } = user;
+
+      const data: UserModelInterface =
+        await this.userService.requestResetPasswordCode(String(_id));
+
+      if (!data) {
+        return res.internal({});
+      }
+
+      const { resetPasswordCode } = data;
+
+      const title = CONSTANTS.RESET_PASSWORD;
+
+      const body = CONSTANTS.RESET_PASSWORD_BODY.replace(
+        "{user.resetPasswordCode}",
+        resetPasswordCode
+      );
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: String(_id),
+        actor: null,
+        description: "/user/request-reset-password",
+      });
+
+      await this.nodeMailer.nodeMailerSendMail([email], title, body);
+
+      return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const { email, code } = req.params;
+
+      const user: UserModelInterface =
+        await this.userService.checkRequestResetPasswordCode(email, code);
+
+      if (!user) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.EMAIL_OR_CODE_WRONG);
+      }
+
+      const { password } = req.body;
+
+      const isMatch: boolean = await bcrypt.compare(password, user.password);
+
+      if (isMatch) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.NEW_PASSWORD_NOT_CHANGED);
+      }
+
+      const hashedPassword = await bcrypt.hash(
+        password,
+        CONSTANTS.PASSWORD_SALT
+      );
+
+      const data: UserModelInterface = await this.userService.resetPassword(
+        email,
+        hashedPassword
+      );
+
+      const token = jwt.sign(
+        { userId: String(data._id) },
+        RANDOM_TOKEN_SECRET,
+        { expiresIn: "14d" }
+      );
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: String(data._id),
+        actor: String(data._id),
+        description: "/user/reset-password",
+      });
+
+      return res.successRes({
+        data: {
+          token,
+          _id: data._id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          avatar: data.avatar,
+          role: data.role,
+        },
+      });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.message });

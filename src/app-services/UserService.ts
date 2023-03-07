@@ -9,6 +9,7 @@ import { injectable } from "inversify";
 import bcrypt = require("bcryptjs");
 import CONSTANTS from "@app-utils/Constants";
 import { Types } from "mongoose";
+import { stringGenerator } from "@app-utils/utils";
 
 @injectable()
 class UserService implements IUserService {
@@ -103,6 +104,45 @@ class UserService implements IUserService {
     )
       .select("-__v")
       .lean();
+
+    return user;
+  }
+
+  async requestResetPasswordCode(userId: string): Promise<UserModelInterface> {
+    const code = stringGenerator(CONSTANTS.RESET_PASSWORD_CODE_LENGTH);
+
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      userId,
+      {
+        $set: { resetPasswordCode: code, updatedAt: new Date() },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return user;
+  }
+
+  async checkRequestResetPasswordCode(
+    email: string,
+    code: string
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findOne({
+      email,
+      resetPasswordCode: code,
+    });
+
+    return user;
+  }
+
+  async resetPassword(
+    email: string,
+    password: string
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findOneAndUpdate(
+      { email },
+      { $set: { password, updatedAt: new Date(), code: "" } },
+      { new: true, useFindAndModify: false }
+    );
 
     return user;
   }

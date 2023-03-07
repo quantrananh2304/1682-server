@@ -8,9 +8,14 @@ const CONSTANTS = {
   ACCOUNT_REGISTERED_BODY:
     "<p>Your account {user.username} has been registered successfully. You can login to <a href=onemorepage.com><b>One more page</b></a> using your username or email.</p>",
 
+  RESET_PASSWORD: "Reset password code",
+
+  RESET_PASSWORD_BODY:
+    "<p>You are requesting for a reset password code. Your code is <b>{user.resetPasswordCode}</b>.</p>",
+
   PASSWORD_MIN_LENGTH: 8,
 
-  PASSWORD_MAX_LENGTH: 12,
+  PASSWORD_MAX_LENGTH: 16,
 
   SUCCESS: "Success",
 
@@ -23,6 +28,8 @@ const CONSTANTS = {
   UNAUTHORIZED: "Unauthorized",
 
   INTERNAL_ERROR: "Internal error",
+
+  RESET_PASSWORD_CODE_LENGTH: 8,
 
   SERVER_ERROR: {
     USER_EXISTED: {
@@ -53,6 +60,16 @@ const CONSTANTS = {
     WRONG_PASSWORD: {
       errorCode: "06",
       message: "Wrong password",
+    },
+
+    EMAIL_OR_CODE_WRONG: {
+      errorCode: "07",
+      message: "Email or reset code wrong",
+    },
+
+    NEW_PASSWORD_NOT_CHANGED: {
+      errorCode: "08",
+      message: "New password must be different from old password",
     },
 
     UNKNOWN_DATA: {

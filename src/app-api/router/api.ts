@@ -31,6 +31,22 @@ router.put(
   UserControllerInstance.changePassword.bind(UserControllerInstance)
 );
 
+router.put(
+  "/user/:email/request-reset-password",
+  UserMiddleware.requestResetPassword,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  UserControllerInstance.requestResetPasswordCode.bind(UserControllerInstance)
+);
+
+router.put(
+  "/user/:email/reset-password/:code",
+  UserMiddleware.resetPassword,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  UserControllerInstance.resetPassword.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

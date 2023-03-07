@@ -41,6 +41,15 @@ export interface IUserService {
   ): Promise<UserModelInterface>;
 
   getUserById(userId: string): Promise<UserModelInterface>;
+
+  requestResetPasswordCode(userId: string): Promise<UserModelInterface>;
+
+  resetPassword(email: string, password: string): Promise<UserModelInterface>;
+
+  checkRequestResetPasswordCode(
+    email: string,
+    code: string
+  ): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

@@ -59,7 +59,7 @@ const UserMiddleware = {
       })
       .custom((newPassword: string) =>
         new RegExp(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d#@$!%*?&()]{8,16}$/
         ).test(newPassword)
       )
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.PASSWORD_NOT_VALID),
@@ -93,7 +93,7 @@ const UserMiddleware = {
       })
       .custom((newPassword: string) =>
         new RegExp(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d#@$!%*?&()]{8,16}$/
         ).test(newPassword)
       )
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.PASSWORD_NOT_VALID),
@@ -104,6 +104,69 @@ const UserMiddleware = {
       .custom(
         (confirmPassword: string, { req }) =>
           confirmPassword === req.body.newPassword
+      )
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.CONFIRM_PASSWORD_DIFFERENT),
+  ],
+
+  requestResetPassword: [
+    param("email")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((email: string) => {
+        if (email.length > 50) {
+          return false;
+        }
+
+        return new RegExp(
+          /^[a-z0-9-](\.?-?_?[a-z0-9]){5,}@(gmail\.com)?(fpt\.edu\.vn)?$/
+        ).test(email);
+      })
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.EMAIL_FORMAT_NOT_VALID),
+  ],
+
+  resetPassword: [
+    param("email")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((email: string) => {
+        if (email.length > 50) {
+          return false;
+        }
+
+        return new RegExp(
+          /^[a-z0-9-](\.?-?_?[a-z0-9]){5,}@(gmail\.com)?(fpt\.edu\.vn)?$/
+        ).test(email);
+      })
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.EMAIL_FORMAT_NOT_VALID),
+
+    param("code")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .isLength({
+        min: CONSTANTS.RESET_PASSWORD_CODE_LENGTH,
+        max: CONSTANTS.RESET_PASSWORD_CODE_LENGTH,
+      }),
+
+    body("password")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .isLength({
+        min: CONSTANTS.PASSWORD_MIN_LENGTH,
+        max: CONSTANTS.PASSWORD_MAX_LENGTH,
+      })
+      .custom((newPassword: string) =>
+        new RegExp(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d#@$!%*?&()]{8,16}$/
+        ).test(newPassword)
+      )
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.PASSWORD_NOT_VALID),
+
+    body("confirmPassword")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom(
+        (confirmPassword: string, { req }) =>
+          confirmPassword === req.body.password
       )
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.CONFIRM_PASSWORD_DIFFERENT),
   ],

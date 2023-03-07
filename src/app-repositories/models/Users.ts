@@ -38,6 +38,7 @@ export interface UserModelInterface extends BaseModelInterface {
   favorites: Array<{ book: string | Types.ObjectId; createdAt: Date }>;
   following: Array<{ user: string | Types.ObjectId; createdAt: Date }>;
   followers: Array<{ user: string | Types.ObjectId; createdAt: Date }>;
+  resetPasswordCode: string;
 }
 
 const userSchema = new Schema({
@@ -168,6 +169,11 @@ const userSchema = new Schema({
     ],
     default: [],
     _id: false,
+  },
+
+  resetPasswordCode: {
+    type: String,
+    default: "",
   },
 });
 
