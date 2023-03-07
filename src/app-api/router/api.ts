@@ -81,4 +81,13 @@ router.post(
   TopicControllerInstance.createTopic.bind(TopicControllerInstance)
 );
 
+router.get(
+  "/topic/list",
+  TopicMiddleware.getListTopic,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TopicControllerInstance.getListTopic.bind(TopicControllerInstance)
+);
+
 export default router;

@@ -262,7 +262,22 @@ class UserService implements IUserService {
         .sort(sort)
         .limit(limit)
         .skip(skip),
-      Users.find({}).countDocuments(),
+      Users.find({
+        $and: [
+          {
+            $or: [
+              { firstName: { $regex: keyword, $options: "i" } },
+              { lastName: { $regex: keyword, $options: "i" } },
+              { username: { $regex: keyword, $options: "i" } },
+              { email: { $regex: keyword, $options: "i" } },
+              { phoneNumber: { $regex: keyword, $options: "i" } },
+            ],
+          },
+          {
+            username: { $ne: "admin" },
+          },
+        ],
+      }).countDocuments(),
     ]);
 
     return {
