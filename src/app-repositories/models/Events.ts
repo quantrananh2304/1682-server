@@ -6,6 +6,7 @@ export const EVENT_COLLECTION_NAME = "events";
 export enum EVENT_SCHEMA {
   USER = "USER",
   TOPIC = "TOPIC",
+  BOOK = "BOOK",
 }
 
 export enum EVENT_ACTION {

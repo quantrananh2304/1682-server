@@ -114,4 +114,13 @@ router.post(
   BookControllerInstance.createBook.bind(BookControllerInstance)
 );
 
+router.get(
+  "/book/list",
+  BookMiddleware.getListBook,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  BookControllerInstance.getListBook.bind(BookControllerInstance)
+);
+
 export default router;

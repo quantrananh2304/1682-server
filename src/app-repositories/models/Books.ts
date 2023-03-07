@@ -167,7 +167,7 @@ const bookSchema = new Schema({
     default: new Date(),
   },
   updatedBy: {
-    type: Types.ObjectId && String,
+    type: Types.ObjectId,
     ref: "users",
   },
 });

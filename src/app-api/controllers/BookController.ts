@@ -1,5 +1,6 @@
 import { Request, Response } from "@app-helpers/http.extends";
 import { BookModelInterface } from "@app-repositories/models/Books";
+import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
 import { TopicModelInterface } from "@app-repositories/models/Topics";
 import TYPES from "@app-repositories/types";
 import BookService from "@app-services/BookService";
@@ -37,6 +38,14 @@ class BookController {
         return res.internal({});
       }
 
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.BOOK,
+        action: EVENT_ACTION.CREATE,
+        schemaId: String(book._id),
+        actor: String(req.headers.userId),
+        description: "/book/create",
+      });
+
       const data: BookModelInterface = await this.bookService.getBookById(
         String(book._id)
       );
@@ -46,6 +55,36 @@ class BookController {
       }
 
       return res.successRes({ data });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  async getListBook(req: Request, res: Response) {
+    try {
+      const { page, limit, sort, keyword } = req.query;
+
+      const book = await this.bookService.getListBook({
+        page: Number(page) - 1,
+        limit: Number(limit),
+        sort,
+        keyword: keyword || "",
+      });
+
+      if (!book) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.BOOK,
+        action: EVENT_ACTION.READ,
+        schemaId: null,
+        actor: String(req.headers.userId),
+        description: "/book/list",
+      });
+
+      return res.successRes({ data: book });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });

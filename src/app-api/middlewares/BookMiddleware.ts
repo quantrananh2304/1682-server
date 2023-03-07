@@ -1,7 +1,8 @@
-import { body } from "express-validator";
+import { body, query } from "express-validator";
 import { isValidObjectId } from "mongoose";
 import _ = require("lodash");
 import CONSTANTS from "@app-utils/Constants";
+import { GET_LIST_BOOK_SORT } from "@app-services/interface";
 
 const BookMiddleware = {
   create: [
@@ -26,6 +27,26 @@ const BookMiddleware = {
           (item) => item.name && item.content && item.name.length <= 50
         )
       ),
+  ],
+
+  getListBook: [
+    query("page").exists({ checkNull: true }).isInt({ min: 1 }),
+
+    query("limit")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isInt({ min: 5 }),
+
+    query("sort")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((sort: string) => {
+        if (!GET_LIST_BOOK_SORT[sort]) {
+          return false;
+        }
+
+        return true;
+      })
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.SORT_OPTION_INVALID),
   ],
 };
 

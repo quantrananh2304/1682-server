@@ -39,6 +39,25 @@ export enum GET_LIST_TOPIC_SORT {
   DATE_CREATED_DESC = "DATE_CREATED_DESC",
 }
 
+export enum GET_LIST_BOOK_SORT {
+  TITLE_ASC = "TITLE_ASC",
+  TITLE_DESC = "TITLE_DESC",
+  CHAPTER_ASC = "CHAPTER_ASC",
+  CHAPTER_DESC = "CHAPTER_DESC",
+  LIKE_ASC = "LIKE_ASC",
+  LIKE_DESC = "LIKE_DESC",
+  DISLIKE_ASC = "DISLIKE_ASC",
+  DISLIKE_DESC = "DISLIKE_DESC",
+  VIEW_ASC = "VIEW_ASC",
+  VIEW_DESC = "VIEW_DESC",
+  COMMENT_ASC = "COMMENT_ASC",
+  COMMENT_DESC = "COMMENT_DESC",
+  TOPIC_ASC = "TOPIC_ASC",
+  TOPIC_DESC = "TOPIC_DESC",
+  SUBSCRIBED_USER_ASC = "SUBSCRIBED_USER_ASC",
+  SUBSCRIBED_USER_DESC = "SUBSCRIBED_USER_DESC",
+}
+
 export interface IUserService {
   createUser(_user: {
     firstName: string;
@@ -146,4 +165,16 @@ export interface IBookService {
   ): Promise<BookModelInterface>;
 
   getBookById(_id: string): Promise<BookModelInterface>;
+
+  getListBook(filter: {
+    page: number;
+    limit: number;
+    sort: GET_LIST_BOOK_SORT;
+    keyword: string;
+  }): Promise<{
+    books: Array<BookModelInterface>;
+    page: number;
+    total: number;
+    totalPage: number;
+  }>;
 }
