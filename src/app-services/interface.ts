@@ -9,6 +9,27 @@ import {
 } from "@app-repositories/models/Users";
 import { Types } from "mongoose";
 
+export enum GET_LIST_USER_SORT {
+  NAME_ASC = "NAME_ASC",
+  NAME_DESC = "NAME_DESC",
+  USERNAME_ASC = "USERNAME_ASC",
+  USERNAME_DESC = "USERNAME_DESC",
+  EMAIL_ASC = "EMAIL_ASC",
+  EMAIL_DESC = "EMAIL_DESC",
+  ROLE_ASC = "ROLE_ASC",
+  ROLE_DESC = "ROLE_DESC",
+  ADDRESS_ASC = "ADDRESS_ASC",
+  ADDRESS_DESC = "ADDRESS_DESC",
+  DOB_ASC = "DOB_ASC",
+  DOB_DESC = "DOB_DESC",
+  PHONE_NUMBER_ASC = "PHONE_NUMBER_ASC",
+  PHONE_NUMBER_DESC = "PHONE_NUMBER_DESC",
+  GENDER_ASC = "GENDER_ASC",
+  GENDER_DESC = "GENDER_DESC",
+  DATE_CREATED_ASC = "DATE_CREATED_ASC",
+  DATE_CREATED_DESC = "DATE_CREATED_DESC",
+}
+
 export interface IUserService {
   createUser(_user: {
     firstName: string;
@@ -50,6 +71,18 @@ export interface IUserService {
     email: string,
     code: string
   ): Promise<UserModelInterface>;
+
+  getListUser(filter: {
+    page: number;
+    limit: number;
+    sort: GET_LIST_USER_SORT;
+    keyword: string;
+  }): Promise<{
+    users: Array<UserModelInterface>;
+    page: number;
+    total: number;
+    totalPage: number;
+  }>;
 }
 
 export interface IEventService {

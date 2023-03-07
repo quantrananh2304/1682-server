@@ -4,7 +4,7 @@ import Users, {
   USER_STATUS,
   UserModelInterface,
 } from "@app-repositories/models/Users";
-import { IUserService } from "./interface";
+import { GET_LIST_USER_SORT, IUserService } from "./interface";
 import { injectable } from "inversify";
 import bcrypt = require("bcryptjs");
 import CONSTANTS from "@app-utils/Constants";
@@ -145,6 +145,133 @@ class UserService implements IUserService {
     );
 
     return user;
+  }
+
+  async getListUser(filter: {
+    page: number;
+    limit: number;
+    sort: GET_LIST_USER_SORT;
+    keyword: string;
+  }): Promise<{
+    users: UserModelInterface[];
+    page: number;
+    total: number;
+    totalPage: number;
+  }> {
+    const { page, limit, keyword } = filter;
+
+    const skip = page * limit;
+
+    let sort = {};
+
+    switch (filter.sort) {
+      case GET_LIST_USER_SORT.ADDRESS_ASC:
+        sort = { address: 1 };
+        break;
+
+      case GET_LIST_USER_SORT.ADDRESS_DESC:
+        sort = { address: -1 };
+        break;
+
+      case GET_LIST_USER_SORT.DOB_ASC:
+        sort = { dob: 1 };
+        break;
+
+      case GET_LIST_USER_SORT.DOB_DESC:
+        sort = { dob: -1 };
+        break;
+
+      case GET_LIST_USER_SORT.EMAIL_ASC:
+        sort = { email: 1 };
+        break;
+
+      case GET_LIST_USER_SORT.EMAIL_DESC:
+        sort = { email: -1 };
+        break;
+
+      case GET_LIST_USER_SORT.GENDER_ASC:
+        sort = { gender: 1 };
+        break;
+
+      case GET_LIST_USER_SORT.GENDER_DESC:
+        sort = { gender: -1 };
+        break;
+
+      case GET_LIST_USER_SORT.NAME_ASC:
+        sort = { firstName: 1 };
+        break;
+
+      case GET_LIST_USER_SORT.NAME_DESC:
+        sort = { firstName: -1 };
+        break;
+
+      case GET_LIST_USER_SORT.PHONE_NUMBER_ASC:
+        sort = { phoneNumber: 1 };
+        break;
+
+      case GET_LIST_USER_SORT.PHONE_NUMBER_DESC:
+        sort = { phoneNumber: -1 };
+        break;
+
+      case GET_LIST_USER_SORT.DATE_CREATED_ASC:
+        sort = { createdAt: 1 };
+        break;
+
+      case GET_LIST_USER_SORT.DATE_CREATED_DESC:
+        sort = { createdAt: -1 };
+        break;
+
+      case GET_LIST_USER_SORT.ROLE_ASC:
+        sort = { role: 1 };
+        break;
+
+      case GET_LIST_USER_SORT.ROLE_DESC:
+        sort = { role: -1 };
+        break;
+
+      case GET_LIST_USER_SORT.USERNAME_ASC:
+        sort = { username: 1 };
+        break;
+
+      case GET_LIST_USER_SORT.USERNAME_DESC:
+        sort = { username: -1 };
+        break;
+
+      default:
+        break;
+    }
+
+    const [users, total] = await Promise.all([
+      Users.find({
+        $and: [
+          {
+            $or: [
+              { firstName: { $regex: keyword, $options: "i" } },
+              { lastName: { $regex: keyword, $options: "i" } },
+              { username: { $regex: keyword, $options: "i" } },
+              { email: { $regex: keyword, $options: "i" } },
+              { phoneNumber: { $regex: keyword, $options: "i" } },
+            ],
+          },
+          {
+            username: { $ne: "admin" },
+          },
+        ],
+      })
+        .select("-__v -password -resetPasswordCode")
+        .sort(sort)
+        .limit(limit)
+        .skip(skip),
+      Users.find({}).countDocuments(),
+    ]);
+
+    return {
+      users,
+      total,
+      page: page + 1,
+      totalPage:
+        total % limit === 0 ? total / limit : Math.floor(total / limit) + 1,
+    };
   }
 }
 

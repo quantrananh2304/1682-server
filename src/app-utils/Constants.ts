@@ -76,6 +76,21 @@ const CONSTANTS = {
       errorCode: "010",
       message: "Unknown parameters passed",
     },
+
+    ADMIN_ONLY: {
+      errorCode: "011",
+      message: "Required admin permission",
+    },
+
+    AUTHORIZATION_UNAUTHORIZED: {
+      errorCode: "401",
+      message: "Unauthorized",
+    },
+
+    AUTHORIZATION_FORBIDDEN: {
+      errorCode: "403",
+      message: "Authorization forbidden",
+    },
   },
 
   VALIDATION_MESSAGE: {
@@ -88,6 +103,8 @@ const CONSTANTS = {
     CONFIRM_PASSWORD_DIFFERENT: "Confirm password not the same",
 
     OBJECTID_INVALID: "Not a valid ObjectId",
+
+    SORT_OPTION_INVALID: "Sort option invalid",
   },
 };
 

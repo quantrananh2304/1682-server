@@ -202,7 +202,7 @@ class UserController {
       );
 
       const token = jwt.sign(
-        { userId: String(data._id) },
+        { userId: String(data._id), userRole: user.role },
         RANDOM_TOKEN_SECRET,
         { expiresIn: "14d" }
       );
@@ -225,6 +225,36 @@ class UserController {
           role: data.role,
         },
       });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async getListUser(req: Request, res: Response) {
+    try {
+      const { page, limit, sort, keyword } = req.query;
+
+      const user = await this.userService.getListUser({
+        page: Number(page) - 1,
+        limit: Number(limit),
+        sort,
+        keyword: keyword || "",
+      });
+
+      if (!user) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.READ,
+        schemaId: null,
+        actor: String(req.headers.userId),
+        description: "/user/list",
+      });
+
+      return res.successRes({ data: user });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.message });

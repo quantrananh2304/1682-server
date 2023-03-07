@@ -2,6 +2,7 @@ import AuthenticationController from "@app-api/controllers/AuthenticationControl
 import UserController from "@app-api/controllers/UserController";
 import AuthenticationMiddleware from "@app-api/middlewares/AuthenticationMiddleware";
 import ParamsValidations from "@app-api/middlewares/ParamsValidation";
+import TokenValidation from "@app-api/middlewares/Token";
 import UserMiddleware from "@app-api/middlewares/UserMiddleware";
 import container from "@app-repositories/ioc";
 import express = require("express");
@@ -28,6 +29,7 @@ router.put(
   UserMiddleware.changePassword,
   ParamsValidations.validationRequest,
   ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
   UserControllerInstance.changePassword.bind(UserControllerInstance)
 );
 
@@ -45,6 +47,15 @@ router.put(
   ParamsValidations.validationRequest,
   ParamsValidations.preventUnknownData,
   UserControllerInstance.resetPassword.bind(UserControllerInstance)
+);
+
+router.get(
+  "/user/list",
+  UserMiddleware.getListUser,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.getListUser.bind(UserControllerInstance)
 );
 
 // auth
