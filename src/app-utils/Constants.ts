@@ -92,6 +92,11 @@ const CONSTANTS = {
       message: "Topic not exist",
     },
 
+    AUTHOR_ONLY: {
+      errorCode: "014",
+      message: "Author only",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

@@ -49,9 +49,30 @@ async function checkAdmin(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+async function checkAuthor(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+
+    jwt.verify(token, RANDOM_TOKEN_SECRET, (err: Error, payload: any) => {
+      if (payload) {
+        const { userRole } = payload;
+
+        if (USER_ROLE[userRole] === USER_ROLE.AUTHOR) {
+          next();
+        } else {
+          return res.forbidden(CONSTANTS.SERVER_ERROR.AUTHOR_ONLY);
+        }
+      }
+    });
+  } catch (error) {
+    return res.forbidden(CONSTANTS.SERVER_ERROR.AUTHOR_ONLY);
+  }
+}
+
 const TokenValidation = {
   checkAdmin,
   checkToken,
+  checkAuthor,
 };
 
 export default TokenValidation;

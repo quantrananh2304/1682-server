@@ -1,3 +1,4 @@
+import { BookModelInterface } from "@app-repositories/models/Books";
 import {
   EVENT_ACTION,
   EVENT_SCHEMA,
@@ -130,4 +131,19 @@ export interface ITopicService {
     _topic: { name: string; note: string; _id: string },
     actor: string
   ): Promise<TopicModelInterface>;
+
+  getTopicById(_id: string): Promise<TopicModelInterface>;
+}
+
+export interface IBookService {
+  createBook(
+    _book: {
+      title: string;
+      chapters: Array<{ name: string; content: string }>;
+      topics: Array<string>;
+    },
+    actor: string
+  ): Promise<BookModelInterface>;
+
+  getBookById(_id: string): Promise<BookModelInterface>;
 }

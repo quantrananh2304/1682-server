@@ -103,6 +103,12 @@ class TopicService implements ITopicService {
 
     return topic;
   }
+
+  async getTopicById(_id: string): Promise<TopicModelInterface> {
+    const topic: TopicModelInterface = await Topics.findById(_id);
+
+    return topic;
+  }
 }
 
 export default TopicService;

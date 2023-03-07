@@ -1,7 +1,9 @@
 import AuthenticationController from "@app-api/controllers/AuthenticationController";
+import BookController from "@app-api/controllers/BookController";
 import TopicController from "@app-api/controllers/TopicController";
 import UserController from "@app-api/controllers/UserController";
 import AuthenticationMiddleware from "@app-api/middlewares/AuthenticationMiddleware";
+import BookMiddleware from "@app-api/middlewares/BookMiddleware";
 import ParamsValidations from "@app-api/middlewares/ParamsValidation";
 import TokenValidation from "@app-api/middlewares/Token";
 import TopicMiddleware from "@app-api/middlewares/TopicMiddleware";
@@ -15,6 +17,7 @@ const UserControllerInstance = container.get<UserController>(UserController);
 const AuthenticationControllerInstance =
   container.get<AuthenticationController>(AuthenticationController);
 const TopicControllerInstance = container.get<TopicController>(TopicController);
+const BookControllerInstance = container.get<BookController>(BookController);
 
 router.get("/test", (req, res) => res.send({ status: "OK" }));
 
@@ -98,6 +101,17 @@ router.put(
   TokenValidation.checkToken,
   TokenValidation.checkAdmin,
   TopicControllerInstance.updateTopic.bind(TopicControllerInstance)
+);
+
+// book
+router.post(
+  "/author/book/create",
+  BookMiddleware.create,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAuthor,
+  BookControllerInstance.createBook.bind(BookControllerInstance)
 );
 
 export default router;
