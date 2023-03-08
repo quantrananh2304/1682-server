@@ -64,6 +64,16 @@ router.get(
   UserControllerInstance.getListUser.bind(UserControllerInstance)
 );
 
+router.put(
+  "/admin/user/:userId/warn",
+  UserMiddleware.warnUser,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAdmin,
+  UserControllerInstance.warnUser.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

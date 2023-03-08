@@ -111,6 +111,12 @@ export interface IUserService {
     total: number;
     totalPage: number;
   }>;
+
+  warnUser(
+    _id: string,
+    message: string,
+    actor: string
+  ): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

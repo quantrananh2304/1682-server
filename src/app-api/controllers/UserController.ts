@@ -1,6 +1,6 @@
 import { Request, Response } from "@app-helpers/http.extends";
 import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
-import { UserModelInterface } from "@app-repositories/models/Users";
+import { USER_ROLE, UserModelInterface } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import EventService from "@app-services/EventService";
 import UserService from "@app-services/UserService";
@@ -255,6 +255,33 @@ class UserController {
       });
 
       return res.successRes({ data: user });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async warnUser(req: Request, res: Response) {
+    try {
+      const { userId } = req.params;
+      const { message } = req.body;
+      const { userRole } = req.headers;
+
+      if (userRole !== USER_ROLE.ADMIN) {
+        return res.forbidden(CONSTANTS.SERVER_ERROR.ADMIN_ONLY);
+      }
+
+      const user: UserModelInterface = await this.userService.warnUser(
+        userId,
+        message,
+        req.headers.userId
+      );
+
+      if (!user) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      return res.successRes({ data: {} });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.message });

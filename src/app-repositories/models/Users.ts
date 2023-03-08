@@ -182,6 +182,10 @@ const userSchema = new Schema({
       {
         message: String,
         createdAt: Date,
+        createdBy: {
+          type: Types.ObjectId,
+          ref: "users",
+        },
       },
     ],
     default: [],

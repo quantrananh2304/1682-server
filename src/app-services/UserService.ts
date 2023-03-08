@@ -289,6 +289,29 @@ class UserService implements IUserService {
         total % limit === 0 ? total / limit : Math.floor(total / limit) + 1,
     };
   }
+
+  async warnUser(
+    _id: string,
+    message: string,
+    actor: string
+  ): Promise<UserModelInterface> {
+    const user = await Users.findByIdAndUpdate(
+      _id,
+      {
+        $push: {
+          warning: {
+            message,
+            createdAt: new Date(),
+            createdBy: Types.ObjectId(actor),
+          },
+          $position: 0,
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return user;
+  }
 }
 
 export default UserService;

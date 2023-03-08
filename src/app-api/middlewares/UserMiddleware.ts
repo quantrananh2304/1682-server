@@ -191,6 +191,15 @@ const UserMiddleware = {
       })
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.SORT_OPTION_INVALID),
   ],
+
+  warnUser: [
+    param("userId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .custom((userId: string) => isValidObjectId(userId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("message").exists({ checkFalsy: true, checkNull: true }).isString(),
+  ],
 };
 
 export default UserMiddleware;
