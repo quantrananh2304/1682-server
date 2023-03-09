@@ -137,6 +137,16 @@ const CONSTANTS = {
       message: "Comment not exist",
     },
 
+    CANNOT_EDIT_OTHER_COMMENT: {
+      errorCode: "023",
+      message: "Cannot edit others' comment",
+    },
+
+    CANNOT_DELETE_OTHER_COMMENT: {
+      errorCode: "024",
+      message: "Cannot delete others' comment",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

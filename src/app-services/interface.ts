@@ -298,4 +298,10 @@ export interface IPostService {
     content: string,
     actor: string
   ): Promise<PostModelInterface>;
+
+  deleteCommentPost(
+    postId: string,
+    commentId: string,
+    actor: string
+  ): Promise<PostModelInterface>;
 }

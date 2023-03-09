@@ -167,8 +167,16 @@ class PostController {
 
       const { comments } = post;
 
-      if (!comments.map((item) => String(item._id)).includes(commentId)) {
+      const matchedComment = comments.filter(
+        (item) => String(item._id) === commentId
+      )[0];
+
+      if (!matchedComment) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.COMMENT_NOT_EXIST);
+      }
+
+      if (!String(matchedComment.createdBy) === userId) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.CANNOT_EDIT_OTHER_COMMENT);
       }
 
       const updatedPost: PostModelInterface =
@@ -189,6 +197,55 @@ class PostController {
         schemaId: postId,
         actor: userId,
         description: "/post/edit-comment",
+      });
+
+      return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  async deleteComment(req: Request, res: Response) {
+    try {
+      const { postId, commentId } = req.params;
+      const { userId } = req.headers;
+
+      const post: PostModelInterface = await this.postService.getPostById(
+        postId
+      );
+
+      if (!post || post.hidden.isHidden) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.POST_NOT_EXIST);
+      }
+
+      const { comments } = post;
+
+      const matchedComment = comments.filter(
+        (item) => String(item._id) === commentId
+      )[0];
+
+      if (!matchedComment) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.COMMENT_NOT_EXIST);
+      }
+
+      if (!String(matchedComment.createdBy) === userId) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.CANNOT_DELETE_OTHER_COMMENT);
+      }
+
+      const updatedPost: PostModelInterface =
+        await this.postService.deleteCommentPost(postId, commentId, userId);
+
+      if (!updatedPost) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.POST,
+        action: EVENT_ACTION.DELETE,
+        schemaId: postId,
+        actor: userId,
+        description: "/post/delete-comment",
       });
 
       return res.successRes({ data: {} });

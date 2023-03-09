@@ -234,4 +234,13 @@ router.put(
   PostControllerInstance.editComment.bind(PostControllerInstance)
 );
 
+router.delete(
+  "/post/:postId/delete-comment/:commentId",
+  PostMiddleware.deleteComment,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PostControllerInstance.deleteComment.bind(PostControllerInstance)
+);
+
 export default router;

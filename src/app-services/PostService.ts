@@ -514,6 +514,35 @@ class PostService implements IPostService {
 
     return updatedPost;
   }
+
+  async deleteCommentPost(
+    postId: string,
+    commentId: string,
+    actor: string
+  ): Promise<PostModelInterface> {
+    const post: PostModelInterface = await Posts.findOneAndUpdate(
+      {
+        _id: Types.ObjectId(postId),
+        comments: {
+          $elemMatch: {
+            _id: Types.ObjectId(commentId),
+            createdBy: Types.ObjectId(actor),
+          },
+        },
+      },
+      {
+        $pull: {
+          comments: {
+            _id: Types.ObjectId(commentId),
+            createdBy: Types.ObjectId(actor),
+          },
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return post;
+  }
 }
 
 export default PostService;

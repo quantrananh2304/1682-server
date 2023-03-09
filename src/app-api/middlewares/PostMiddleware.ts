@@ -74,6 +74,20 @@ const PostMiddleware = {
 
     body("content").exists({ checkFalsy: true, checkNull: true }).isString(),
   ],
+
+  deleteComment: [
+    param("postId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((postId: string) => isValidObjectId(postId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    param("commentId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((commentId: string) => isValidObjectId(commentId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
 };
 
 export default PostMiddleware;
