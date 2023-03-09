@@ -63,6 +63,19 @@ export enum GET_LIST_BOOK_SORT {
   SUBSCRIBED_USER_DESC = "SUBSCRIBED_USER_DESC",
 }
 
+export enum GET_LIST_REPORT_SORT {
+  TITLE_ASC = "TITLE_ASC",
+  TITLE_DESC = "TITLE_DESC",
+  DATE_CREATED_ASC = "DATE_CREATED_ASC",
+  DATE_CREATED_DESC = "DATE_CREATED_DESC",
+  STATUS_ASC = "STATUS_ASC",
+  STATUS_DESC = "STATUS_DESC",
+  TYPE_ASC = "TYPE_ASC",
+  TYPE_DESC = "TYPE_DESC",
+  SCHEMA_ASC = "SCHEMA_ASC",
+  SCHEMA_DESC = "SCHEMA_DESC",
+}
+
 export interface IUserService {
   createUser(_user: {
     firstName: string;
@@ -212,4 +225,16 @@ export interface IReportService {
     schemaId: string,
     actor: string
   ): Promise<ReportModelInterface>;
+
+  getListReport(filter: {
+    page: number;
+    limit: number;
+    sort: GET_LIST_REPORT_SORT;
+    keyword: string;
+  }): Promise<{
+    reports: Array<ReportModelInterface>;
+    page: number;
+    total: number;
+    totalPage: number;
+  }>;
 }

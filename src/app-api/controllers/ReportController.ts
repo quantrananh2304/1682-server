@@ -1,6 +1,6 @@
 import { Request, Response } from "@app-helpers/http.extends";
 import { BookModelInterface } from "@app-repositories/models/Books";
-import { EVENT_ACTION } from "@app-repositories/models/Events";
+import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
 import {
   REPORT_SCHEMA,
   ReportModelInterface,
@@ -65,11 +65,42 @@ class ReportController {
       }
 
       await this.eventService.createEvent({
-        schema,
+        schema: EVENT_SCHEMA.REPORT,
         action: EVENT_ACTION.CREATE,
         schemaId,
         actor: userId,
         description: "/report/create",
+      });
+
+      return res.successRes({ data: report });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  async getListReport(req: Request, res: Response) {
+    try {
+      const { page, limit, sort, keyword } = req.query;
+      const { userId } = req.headers;
+
+      const report = await this.reportService.getListReport({
+        page: Number(page) - 1,
+        limit: Number(limit),
+        sort,
+        keyword: keyword || "",
+      });
+
+      if (!report) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.REPORT,
+        action: EVENT_ACTION.READ,
+        schemaId: null,
+        actor: userId,
+        description: "/report/list",
       });
 
       return res.successRes({ data: report });

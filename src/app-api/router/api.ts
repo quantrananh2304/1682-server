@@ -157,4 +157,14 @@ router.post(
   ReportControllerInstance.createReport.bind(ReportControllerInstance)
 );
 
+router.get(
+  "/admin/report/list",
+  ReportMiddleware.getList,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAdmin,
+  ReportControllerInstance.getListReport.bind(ReportControllerInstance)
+);
+
 export default router;

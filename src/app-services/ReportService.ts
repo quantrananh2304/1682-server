@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { IReportService } from "./interface";
+import { GET_LIST_REPORT_SORT, IReportService } from "./interface";
 import Reports, {
   REPORT_TYPE,
   REPORT_SCHEMA,
@@ -48,6 +48,106 @@ class ReportService implements IReportService {
     });
 
     return report;
+  }
+
+  async getListReport(filter: {
+    page: number;
+    limit: number;
+    sort: GET_LIST_REPORT_SORT;
+    keyword: string;
+  }): Promise<{
+    reports: ReportModelInterface[];
+    page: number;
+    total: number;
+    totalPage: number;
+  }> {
+    const { page, limit, keyword } = filter;
+
+    const skip = page * limit;
+
+    let sort = {};
+
+    switch (filter.sort) {
+      case GET_LIST_REPORT_SORT.DATE_CREATED_ASC:
+        sort = { createdAt: 1 };
+        break;
+
+      case GET_LIST_REPORT_SORT.DATE_CREATED_DESC:
+        sort = { createdAt: -1 };
+        break;
+
+      case GET_LIST_REPORT_SORT.SCHEMA_ASC:
+        sort = { schema: 1 };
+        break;
+
+      case GET_LIST_REPORT_SORT.SCHEMA_DESC:
+        sort = { schema: -1 };
+        break;
+
+      case GET_LIST_REPORT_SORT.STATUS_ASC:
+        sort = { status: 1 };
+        break;
+
+      case GET_LIST_REPORT_SORT.STATUS_DESC:
+        sort = { status: -1 };
+        break;
+
+      case GET_LIST_REPORT_SORT.TITLE_ASC:
+        sort = { title: 1 };
+        break;
+
+      case GET_LIST_REPORT_SORT.TITLE_DESC:
+        sort = { title: -1 };
+        break;
+
+      case GET_LIST_REPORT_SORT.TYPE_ASC:
+        sort = { type: 1 };
+        break;
+
+      case GET_LIST_REPORT_SORT.TYPE_DESC:
+        sort = { type: -1 };
+        break;
+
+      default:
+        break;
+    }
+
+    const [reports, total] = await Promise.all([
+      Reports.find({
+        $or: [
+          {
+            title: { $regex: keyword, $options: "i" },
+            content: { $regex: keyword, $options: "i" },
+            schema: { $regex: keyword, $options: "i" },
+            status: { $regex: keyword, $options: "i" },
+          },
+        ],
+      })
+        .populate("schemaId")
+        .populate({ path: "createdBy", select: "firstName lastName _id" })
+        .sort(sort)
+        .limit(limit)
+        .skip(skip),
+
+      Reports.find({
+        $or: [
+          {
+            title: { $regex: keyword, $options: "i" },
+            content: { $regex: keyword, $options: "i" },
+            schema: { $regex: keyword, $options: "i" },
+            status: { $regex: keyword, $options: "i" },
+          },
+        ],
+      }).countDocuments(),
+    ]);
+
+    return {
+      reports,
+      total,
+      page: page + 1,
+      totalPage:
+        total % limit === 0 ? total / limit : Math.floor(total / limit) + 1,
+    };
   }
 }
 
