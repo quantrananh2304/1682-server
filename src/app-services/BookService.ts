@@ -615,6 +615,32 @@ class BookService implements IBookService {
 
     return updatedBook;
   }
+
+  async deleteCommentBook(
+    bookId: string,
+    commentId: string
+  ): Promise<BookModelInterface> {
+    const book: BookModelInterface = await Books.findOneAndUpdate(
+      {
+        _id: Types.ObjectId(bookId),
+        comments: {
+          $elemMatch: {
+            _id: Types.ObjectId(commentId),
+          },
+        },
+      },
+      {
+        $pull: {
+          comments: {
+            _id: Types.ObjectId(commentId),
+          },
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return book;
+  }
 }
 
 export default BookService;

@@ -92,6 +92,20 @@ const BookMiddleware = {
 
     body("content").exists({ checkFalsy: true, checkNull: true }).isString(),
   ],
+
+  deleteComment: [
+    param("bookId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((bookId: string) => isValidObjectId(bookId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    param("commentId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((commentId: string) => isValidObjectId(commentId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
 };
 
 export default BookMiddleware;

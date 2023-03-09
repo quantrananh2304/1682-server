@@ -518,8 +518,7 @@ class PostService implements IPostService {
 
   async deleteCommentPost(
     postId: string,
-    commentId: string,
-    actor: string
+    commentId: string
   ): Promise<PostModelInterface> {
     const post: PostModelInterface = await Posts.findOneAndUpdate(
       {
@@ -527,7 +526,6 @@ class PostService implements IPostService {
         comments: {
           $elemMatch: {
             _id: Types.ObjectId(commentId),
-            createdBy: Types.ObjectId(actor),
           },
         },
       },
@@ -535,7 +533,6 @@ class PostService implements IPostService {
         $pull: {
           comments: {
             _id: Types.ObjectId(commentId),
-            createdBy: Types.ObjectId(actor),
           },
         },
       },

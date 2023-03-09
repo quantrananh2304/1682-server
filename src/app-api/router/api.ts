@@ -186,6 +186,15 @@ router.put(
   BookControllerInstance.editComment.bind(BookControllerInstance)
 );
 
+router.delete(
+  "/book/:bookId/delete-comment/:commentId",
+  BookMiddleware.deleteComment,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  BookControllerInstance.deleteComment.bind(BookControllerInstance)
+);
+
 // report
 router.post(
   "/report/create",

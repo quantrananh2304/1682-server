@@ -1,6 +1,7 @@
 import { Request, Response } from "@app-helpers/http.extends";
 import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
 import { PostModelInterface } from "@app-repositories/models/Posts";
+import { USER_ROLE } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import EventService from "@app-services/EventService";
 import PostService from "@app-services/PostService";
@@ -209,13 +210,18 @@ class PostController {
   async deleteComment(req: Request, res: Response) {
     try {
       const { postId, commentId } = req.params;
-      const { userId } = req.headers;
+      const { userId, userRole } = req.headers;
 
       const post: PostModelInterface = await this.postService.getPostById(
         postId
       );
 
-      if (!post || post.hidden.isHidden) {
+      if (
+        !post ||
+        (post.hidden.isHidden &&
+          userRole !== USER_ROLE.ADMIN &&
+          String(post.createdBy) !== userId)
+      ) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.POST_NOT_EXIST);
       }
 
@@ -229,12 +235,16 @@ class PostController {
         return res.errorRes(CONSTANTS.SERVER_ERROR.COMMENT_NOT_EXIST);
       }
 
-      if (!String(matchedComment.createdBy) === userId) {
+      if (
+        userRole !== USER_ROLE.ADMIN &&
+        String(matchedComment.createdBy) !== userId &&
+        String(post.createdBy) !== userId
+      ) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.CANNOT_DELETE_OTHER_COMMENT);
       }
 
       const updatedPost: PostModelInterface =
-        await this.postService.deleteCommentPost(postId, commentId, userId);
+        await this.postService.deleteCommentPost(postId, commentId);
 
       if (!updatedPost) {
         return res.internal({});

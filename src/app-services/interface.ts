@@ -241,6 +241,11 @@ export interface IBookService {
     content: string,
     actor: string
   ): Promise<BookModelInterface>;
+
+  deleteCommentBook(
+    bookId: string,
+    commentId: string
+  ): Promise<BookModelInterface>;
 }
 
 export interface IReportService {
