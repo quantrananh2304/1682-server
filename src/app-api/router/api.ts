@@ -216,4 +216,13 @@ router.get(
   PostControllerInstance.getListPost.bind(PostControllerInstance)
 );
 
+router.put(
+  "/post/:postId/comment",
+  PostMiddleware.comment,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PostControllerInstance.commentPost.bind(PostControllerInstance)
+);
+
 export default router;

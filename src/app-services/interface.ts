@@ -285,4 +285,10 @@ export interface IPostService {
     total: number;
     totalPage: number;
   }>;
+
+  commentPost(
+    postId: string,
+    content: string,
+    actor: string
+  ): Promise<PostModelInterface>;
 }

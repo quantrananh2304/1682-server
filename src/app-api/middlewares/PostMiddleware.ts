@@ -48,6 +48,16 @@ const PostMiddleware = {
       })
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.SORT_OPTION_INVALID),
   ],
+
+  comment: [
+    param("postId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((postId: string) => isValidObjectId(postId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("content").exists({ checkFalsy: true, checkNull: true }).isString(),
+  ],
 };
 
 export default PostMiddleware;

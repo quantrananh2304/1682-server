@@ -447,6 +447,30 @@ class PostService implements IPostService {
         total % limit === 0 ? total / limit : Math.floor(total / limit) + 1,
     };
   }
+
+  async commentPost(
+    postId: string,
+    content: string,
+    actor: string
+  ): Promise<PostModelInterface> {
+    const post: PostModelInterface = await Posts.findByIdAndUpdate(
+      postId,
+      {
+        $push: {
+          comments: {
+            content,
+            createdBy: Types.ObjectId(actor),
+            createdAt: new Date(),
+            editHistory: [],
+          },
+          $position: 0,
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return post;
+  }
 }
 
 export default PostService;
