@@ -122,6 +122,11 @@ const CONSTANTS = {
       message: "Post not exist",
     },
 
+    BOOK_ALREADY_IN_FAV_LIST: {
+      errorCode: "020",
+      message: "Book already in favorite list",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

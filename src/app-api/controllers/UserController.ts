@@ -9,12 +9,16 @@ import { inject, injectable } from "inversify";
 import bcrypt = require("bcryptjs");
 import jwt = require("jsonwebtoken");
 import { RANDOM_TOKEN_SECRET } from "@app-configs";
+import BookService from "@app-services/BookService";
+import NodeMailer from "@app-repositories/smtp";
+import { BookModelInterface } from "@app-repositories/models/Books";
 
 @injectable()
 class UserController {
   @inject(TYPES.UserService) private readonly userService: UserService;
   @inject(TYPES.EventService) private readonly eventService: EventService;
-  @inject(TYPES.NodeMailer) private readonly nodeMailer: any;
+  @inject(TYPES.NodeMailer) private readonly nodeMailer: NodeMailer;
+  @inject(TYPES.BookService) private readonly bookService: BookService;
 
   async register(req: Request, res: Response) {
     try {
@@ -280,6 +284,55 @@ class UserController {
       if (!user) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
       }
+
+      return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async addFavoriteBook(req: Request, res: Response) {
+    try {
+      const { bookId } = req.params;
+      const { userId } = req.headers;
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      if (!user) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      const book: BookModelInterface = await this.bookService.getBookById(
+        bookId
+      );
+
+      if (!book || book.hidden.isHidden === true) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_NOT_EXIST);
+      }
+
+      const { favorites } = user;
+
+      if (favorites.map((item) => String(item.book)).includes(bookId)) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_ALREADY_IN_FAV_LIST);
+      }
+
+      const updatedUser: UserModelInterface =
+        await this.userService.addFavoriteBook(bookId, userId);
+
+      if (!updatedUser) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: userId,
+        actor: userId,
+        description: "/user/add-favorite",
+      });
 
       return res.successRes({ data: {} });
     } catch (error) {

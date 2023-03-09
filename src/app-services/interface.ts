@@ -136,6 +136,8 @@ export interface IUserService {
     message: string,
     actor: string
   ): Promise<UserModelInterface>;
+
+  addFavoriteBook(bookId: string, actor: string): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

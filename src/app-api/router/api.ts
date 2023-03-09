@@ -81,6 +81,15 @@ router.put(
   UserControllerInstance.warnUser.bind(UserControllerInstance)
 );
 
+router.put(
+  "/user/add-favorite/:bookId",
+  UserMiddleware.addFavorite,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.addFavoriteBook.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

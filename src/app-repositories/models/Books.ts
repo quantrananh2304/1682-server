@@ -40,7 +40,11 @@ export interface BookModelInterface extends BaseModelInterface {
     user: string | Types.ObjectId;
     createdAt: Date;
   }>;
-  hidden: boolean;
+  hidden: {
+    isHidden: Boolean;
+    hiddenBy: string | Types.ObjectId;
+    hiddenUntil: Date;
+  };
 }
 
 const bookSchema = new Schema({

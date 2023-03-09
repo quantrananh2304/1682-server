@@ -200,6 +200,13 @@ const UserMiddleware = {
 
     body("message").exists({ checkFalsy: true, checkNull: true }).isString(),
   ],
+
+  addFavorite: [
+    param("bookId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .custom((bookId: string) => isValidObjectId(bookId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
 };
 
 export default UserMiddleware;

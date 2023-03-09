@@ -312,6 +312,32 @@ class UserService implements IUserService {
 
     return user;
   }
+
+  async addFavoriteBook(
+    bookId: string,
+    actor: string
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      actor,
+      {
+        $push: {
+          favorites: {
+            book: Types.ObjectId(bookId),
+            createdAt: new Date(),
+          },
+          $position: 0,
+        },
+
+        $set: {
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return user;
+  }
 }
 
 export default UserService;
