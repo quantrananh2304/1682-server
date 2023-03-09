@@ -389,6 +389,33 @@ class UserController {
       return res.internal({ message: error.message });
     }
   }
+
+  async getUserProfile(req: Request, res: Response) {
+    try {
+      const { userId } = req.params;
+
+      const user: UserModelInterface = await this.userService.getUserProfile(
+        userId
+      );
+
+      if (!user) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.READ,
+        schemaId: userId,
+        actor: req.headers.userId,
+        description: "/user/profile",
+      });
+
+      return res.successRes({ data: user });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
 }
 
 export default UserController;

@@ -164,14 +164,14 @@ class BookService implements IBookService {
 
                       firstName: {
                         $arrayElemAt: [
-                          "$likedBy._id",
+                          "$likedBy.firstName",
                           { $indexOfArray: ["$likedBy._id", "$$this.user"] },
                         ],
                       },
 
                       lastName: {
                         $arrayElemAt: [
-                          "$likedBy._id",
+                          "$likedBy.lastName",
                           { $indexOfArray: ["$likedBy._id", "$$this.user"] },
                         ],
                       },
@@ -213,14 +213,14 @@ class BookService implements IBookService {
 
                       firstName: {
                         $arrayElemAt: [
-                          "$dislikeBy._id",
+                          "$dislikeBy.firstName",
                           { $indexOfArray: ["$dislikeBy._id", "$$this.user"] },
                         ],
                       },
 
                       lastName: {
                         $arrayElemAt: [
-                          "$dislikeBy._id",
+                          "$dislikeBy.lastName",
                           { $indexOfArray: ["$dislikeBy._id", "$$this.user"] },
                         ],
                       },
@@ -262,14 +262,14 @@ class BookService implements IBookService {
 
                       firstName: {
                         $arrayElemAt: [
-                          "$viewedBy._id",
+                          "$viewedBy.firstName",
                           { $indexOfArray: ["$viewedBy._id", "$$this.user"] },
                         ],
                       },
 
                       lastName: {
                         $arrayElemAt: [
-                          "$viewedBy._id",
+                          "$viewedBy.lastName",
                           { $indexOfArray: ["$viewedBy._id", "$$this.user"] },
                         ],
                       },
@@ -322,7 +322,7 @@ class BookService implements IBookService {
 
                       firstName: {
                         $arrayElemAt: [
-                          "$subscribedBy._id",
+                          "$subscribedBy.firstName",
                           {
                             $indexOfArray: ["$subscribedBy._id", "$$this.user"],
                           },
@@ -331,7 +331,7 @@ class BookService implements IBookService {
 
                       lastName: {
                         $arrayElemAt: [
-                          "$subscribedBy._id",
+                          "$subscribedBy.lastName",
                           {
                             $indexOfArray: ["$subscribedBy._id", "$$this.user"],
                           },
@@ -380,7 +380,7 @@ class BookService implements IBookService {
 
                       firstName: {
                         $arrayElemAt: [
-                          "$commentedBy._id",
+                          "$commentedBy.firstName",
                           {
                             $indexOfArray: [
                               "$commentedBy._id",
@@ -392,7 +392,7 @@ class BookService implements IBookService {
 
                       lastName: {
                         $arrayElemAt: [
-                          "$commentedBy._id",
+                          "$commentedBy.lastName",
                           {
                             $indexOfArray: [
                               "$commentedBy._id",

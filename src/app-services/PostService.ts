@@ -169,14 +169,14 @@ class PostService implements IPostService {
 
                       firstName: {
                         $arrayElemAt: [
-                          "$likedBy._id",
+                          "$likedBy.firstName",
                           { $indexOfArray: ["$likedBy._id", "$$this.user"] },
                         ],
                       },
 
                       lastName: {
                         $arrayElemAt: [
-                          "$likedBy._id",
+                          "$likedBy.lastName",
                           { $indexOfArray: ["$likedBy._id", "$$this.user"] },
                         ],
                       },
@@ -218,14 +218,14 @@ class PostService implements IPostService {
 
                       firstName: {
                         $arrayElemAt: [
-                          "$dislikeBy._id",
+                          "$dislikeBy.firstName",
                           { $indexOfArray: ["$dislikeBy._id", "$$this.user"] },
                         ],
                       },
 
                       lastName: {
                         $arrayElemAt: [
-                          "$dislikeBy._id",
+                          "$dislikeBy.lastName",
                           { $indexOfArray: ["$dislikeBy._id", "$$this.user"] },
                         ],
                       },
@@ -267,14 +267,14 @@ class PostService implements IPostService {
 
                       firstName: {
                         $arrayElemAt: [
-                          "$viewedBy._id",
+                          "$viewedBy.firstName",
                           { $indexOfArray: ["$viewedBy._id", "$$this.user"] },
                         ],
                       },
 
                       lastName: {
                         $arrayElemAt: [
-                          "$viewedBy._id",
+                          "$viewedBy.lastName",
                           { $indexOfArray: ["$viewedBy._id", "$$this.user"] },
                         ],
                       },
@@ -321,7 +321,7 @@ class PostService implements IPostService {
 
                       firstName: {
                         $arrayElemAt: [
-                          "$commentedBy._id",
+                          "$commentedBy.firstName",
                           {
                             $indexOfArray: [
                               "$commentedBy._id",
@@ -333,7 +333,7 @@ class PostService implements IPostService {
 
                       lastName: {
                         $arrayElemAt: [
-                          "$commentedBy._id",
+                          "$commentedBy.lastName",
                           {
                             $indexOfArray: [
                               "$commentedBy._id",

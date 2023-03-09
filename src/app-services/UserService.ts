@@ -365,6 +365,293 @@ class UserService implements IUserService {
 
     return user;
   }
+
+  async getUserProfile(userId: string): Promise<UserModelInterface> {
+    const aggregation = [
+      { $match: { _id: Types.ObjectId(userId) } },
+
+      {
+        $lookup: {
+          from: "books",
+          localField: "favorites.book",
+          foreignField: "_id",
+          as: "favoriteBook",
+        },
+      },
+
+      {
+        $addFields: {
+          favorites: {
+            $map: {
+              input: "$favorites",
+              in: {
+                $mergeObjects: [
+                  "$$this",
+                  {
+                    book: {
+                      _id: {
+                        $arrayElemAt: [
+                          "$favoriteBook._id",
+                          {
+                            $indexOfArray: ["$favoriteBook._id", "$$this.book"],
+                          },
+                        ],
+                      },
+
+                      title: {
+                        $arrayElemAt: [
+                          "$favoriteBook.title",
+                          {
+                            $indexOfArray: ["$favoriteBook._id", "$$this.book"],
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          favoriteBook: "$$REMOVE",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "following.user",
+          foreignField: "_id",
+          as: "followingUsers",
+        },
+      },
+
+      {
+        $addFields: {
+          following: {
+            $map: {
+              input: "$following",
+              in: {
+                $mergeObjects: [
+                  "$$this",
+                  {
+                    user: {
+                      _id: {
+                        $arrayElemAt: [
+                          "$followingUsers._id",
+                          {
+                            $indexOfArray: [
+                              "$followingUsers._id",
+                              "$$this.user",
+                            ],
+                          },
+                        ],
+                      },
+
+                      firstName: {
+                        $arrayElemAt: [
+                          "$followingUsers.firstName",
+                          {
+                            $indexOfArray: [
+                              "$followingUsers._id",
+                              "$$this.user",
+                            ],
+                          },
+                        ],
+                      },
+
+                      lastName: {
+                        $arrayElemAt: [
+                          "$followingUsers.lastName",
+                          {
+                            $indexOfArray: [
+                              "$followingUsers._id",
+                              "$$this.user",
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          followingUsers: "$$REMOVE",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "followers.user",
+          foreignField: "_id",
+          as: "followedBy",
+        },
+      },
+
+      {
+        $addFields: {
+          followers: {
+            $map: {
+              input: "$followers",
+              in: {
+                $mergeObjects: [
+                  "$$this",
+                  {
+                    user: {
+                      _id: {
+                        $arrayElemAt: [
+                          "$followedBy._id",
+                          { $indexOfArray: ["$followedBy._id", "$$this.user"] },
+                        ],
+                      },
+
+                      firstName: {
+                        $arrayElemAt: [
+                          "$followedBy.firstName",
+                          { $indexOfArray: ["$followedBy._id", "$$this.user"] },
+                        ],
+                      },
+
+                      lastName: {
+                        $arrayElemAt: [
+                          "$followedBy.lastName",
+                          { $indexOfArray: ["$followedBy._id", "$$this.user"] },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          followedBy: "$$REMOVE",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "warning.createdBy",
+          foreignField: "_id",
+          as: "warnedBy",
+        },
+      },
+
+      {
+        $addFields: {
+          warning: {
+            $map: {
+              input: "$warning",
+              in: {
+                $mergeObjects: [
+                  "$$this",
+                  {
+                    createdBy: {
+                      _id: {
+                        $arrayElemAt: [
+                          "$warnedBy._id",
+                          {
+                            $indexOfArray: [
+                              "$warnedBy._id",
+                              "$$this.createdBy",
+                            ],
+                          },
+                        ],
+                      },
+
+                      firstName: {
+                        $arrayElemAt: [
+                          "$warnedBy.firstName",
+                          {
+                            $indexOfArray: [
+                              "$warnedBy._id",
+                              "$$this.createdBy",
+                            ],
+                          },
+                        ],
+                      },
+
+                      lastName: {
+                        $arrayElemAt: [
+                          "$warnedBy.lastName",
+                          {
+                            $indexOfArray: [
+                              "$warnedBy._id",
+                              "$$this.createdBy",
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          warnedBy: "$$REMOVE",
+        },
+      },
+
+      {
+        $project: {
+          _id: 1,
+          firstName: 1,
+          lastName: 1,
+          username: 1,
+          email: 1,
+          avatar: 1,
+          status: 1,
+          role: 1,
+          address: 1,
+          dob: 1,
+          phoneNumber: 1,
+          gender: 1,
+          favorites: 1,
+          following: 1,
+          followers: 1,
+          warning: 1,
+          createdBy: 1,
+
+          favoritesCount: {
+            $cond: {
+              if: { $isArray: "$favorites" },
+              then: { $size: "$favorites" },
+              else: 0,
+            },
+          },
+
+          followingCount: {
+            $cond: {
+              if: { $isArray: "$following" },
+              then: { $size: "$following" },
+              else: 0,
+            },
+          },
+
+          followersCount: {
+            $cond: {
+              if: { $isArray: "$followers" },
+              then: { $size: "$followers" },
+              else: 0,
+            },
+          },
+
+          warningCount: {
+            $cond: {
+              if: { $isArray: "$warning" },
+              then: { $size: "$warning" },
+              else: 0,
+            },
+          },
+        },
+      },
+    ];
+
+    const user = await Users.aggregate(aggregation);
+
+    return user[0];
+  }
 }
 
 export default UserService;

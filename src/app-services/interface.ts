@@ -156,6 +156,8 @@ export interface IUserService {
     bookId: string,
     actor: string
   ): Promise<UserModelInterface>;
+
+  getUserProfile(userId: string): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

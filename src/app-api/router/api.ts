@@ -99,6 +99,15 @@ router.put(
   UserControllerInstance.removeFavoriteBook.bind(UserControllerInstance)
 );
 
+router.get(
+  "/user/:userId/profile",
+  UserMiddleware.getProfile,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.getUserProfile.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",
