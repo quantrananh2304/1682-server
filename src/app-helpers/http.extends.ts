@@ -1,3 +1,4 @@
+import { USER_ROLE } from "@app-repositories/models/Users";
 import { Response as ResponseEX, Request as RequestEX } from "express";
 import { validationResult, Result } from "express-validator";
 import { Types } from "mongoose";
@@ -100,7 +101,7 @@ export interface Request extends RequestEX {
   userRoleId: Types.ObjectId;
   body: any;
   query: any;
-  headers: any;
+  headers: any & { userId: string; userRole: USER_ROLE };
   params: any;
   method: string;
 

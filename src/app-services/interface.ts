@@ -304,4 +304,10 @@ export interface IPostService {
     commentId: string,
     actor: string
   ): Promise<PostModelInterface>;
+
+  likeDislikePost(
+    postId: string,
+    action: "like" | "dislike",
+    actor: string
+  ): Promise<PostModelInterface>;
 }

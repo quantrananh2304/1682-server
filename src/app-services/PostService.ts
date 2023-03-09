@@ -543,6 +543,78 @@ class PostService implements IPostService {
 
     return post;
   }
+
+  async likeDislikePost(
+    postId: string,
+    action: "like" | "dislike",
+    actor: string
+  ): Promise<PostModelInterface> {
+    const post: PostModelInterface = await this.getPostById(postId);
+
+    const { like, dislike } = post;
+
+    let update = {};
+
+    if (action === "like") {
+      if (like.map((item) => String(item.user)).includes(actor)) {
+        update = {
+          $pull: {
+            like: {
+              user: Types.ObjectId(actor),
+            },
+          },
+        };
+      } else {
+        update = {
+          $push: {
+            like: {
+              user: Types.ObjectId(actor),
+              createdAt: new Date(),
+            },
+          },
+
+          $pull: {
+            dislike: {
+              user: Types.ObjectId(actor),
+            },
+          },
+        };
+      }
+    } else {
+      if (dislike.map((item) => String(item.user)).includes(actor)) {
+        update = {
+          $pull: {
+            dislike: {
+              user: Types.ObjectId(actor),
+            },
+          },
+        };
+      } else {
+        update = {
+          $push: {
+            dislike: {
+              user: Types.ObjectId(actor),
+              createdAt: new Date(),
+            },
+          },
+
+          $pull: {
+            like: {
+              user: Types.ObjectId(actor),
+            },
+          },
+        };
+      }
+    }
+
+    const updatedPost: PostModelInterface = await Posts.findByIdAndUpdate(
+      postId,
+      update,
+      { new: true, useFindAndModify: false }
+    );
+
+    return updatedPost;
+  }
 }
 
 export default PostService;

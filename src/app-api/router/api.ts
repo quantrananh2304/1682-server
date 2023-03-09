@@ -243,4 +243,13 @@ router.delete(
   PostControllerInstance.deleteComment.bind(PostControllerInstance)
 );
 
+router.put(
+  "/post/:postId/like-dislike/:action",
+  PostMiddleware.likeDislikePost,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PostControllerInstance.likeDislikePost.bind(PostControllerInstance)
+);
+
 export default router;

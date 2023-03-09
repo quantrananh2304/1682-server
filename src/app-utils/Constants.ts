@@ -170,6 +170,8 @@ const CONSTANTS = {
     OBJECTID_INVALID: "Not a valid ObjectId",
 
     SORT_OPTION_INVALID: "Sort option invalid",
+
+    ACTION_INVALID: "Action invalid",
   },
 };
 

@@ -88,6 +88,20 @@ const PostMiddleware = {
       .custom((commentId: string) => isValidObjectId(commentId))
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
   ],
+
+  likeDislikePost: [
+    param("postId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((postId: string) => isValidObjectId(postId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    param("action")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((action: string) => action === "like" || action === "dislike")
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.ACTION_INVALID),
+  ],
 };
 
 export default PostMiddleware;
