@@ -245,4 +245,12 @@ export interface IPostService {
     _post: { content: string; images: Array<string> },
     actor: string
   ): Promise<PostModelInterface>;
+
+  editPost(
+    _id: string,
+    _post: { content: string; images: Array<string> },
+    actor: string
+  ): Promise<PostModelInterface>;
+
+  getPostById(_id: string): Promise<PostModelInterface>;
 }

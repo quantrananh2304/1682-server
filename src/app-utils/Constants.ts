@@ -112,6 +112,16 @@ const CONSTANTS = {
       message: "Report or feedback already submitted",
     },
 
+    CANNOT_UPDATE_OTHER_POST: {
+      errorCode: "018",
+      message: "Cannot update others' post",
+    },
+
+    POST_NOT_EXIST: {
+      errorCode: "019",
+      message: "Post not exist",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

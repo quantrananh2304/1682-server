@@ -4,6 +4,7 @@ import { PostModelInterface } from "@app-repositories/models/Posts";
 import TYPES from "@app-repositories/types";
 import EventService from "@app-services/EventService";
 import PostService from "@app-services/PostService";
+import CONSTANTS from "@app-utils/Constants";
 import { inject, injectable } from "inversify";
 
 @injectable()
@@ -33,6 +34,51 @@ class PostController {
       });
 
       return res.successRes({ data: post });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  async editPost(req: Request, res: Response) {
+    try {
+      const { postId } = req.params;
+      const { content, images } = req.body;
+      const { userId } = req.headers;
+
+      const post: PostModelInterface = await this.postService.getPostById(
+        postId
+      );
+
+      if (!post) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.POST_NOT_EXIST);
+      }
+
+      const { createdBy } = post;
+
+      if (String(createdBy) !== userId) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.CANNOT_UPDATE_OTHER_POST);
+      }
+
+      const updatedPost: PostModelInterface = await this.postService.editPost(
+        postId,
+        { content, images },
+        userId
+      );
+
+      if (!updatedPost) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.POST,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: postId,
+        actor: userId,
+        description: "/post/update",
+      });
+
+      return res.successRes({ data: updatedPost });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });

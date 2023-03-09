@@ -180,4 +180,13 @@ router.post(
   PostControllerInstance.createPost.bind(PostControllerInstance)
 );
 
+router.put(
+  "/post/:postId/update",
+  PostMiddleware.update,
+  ParamsValidations.validationRequest,
+  ParamsValidations.validationRequest,
+  TokenValidation.checkToken,
+  PostControllerInstance.editPost.bind(PostControllerInstance)
+);
+
 export default router;

@@ -27,6 +27,44 @@ class PostService implements IPostService {
 
     return post;
   }
+
+  async editPost(
+    _id: string,
+    _post: { content: string; images: string[] },
+    actor: string
+  ): Promise<PostModelInterface> {
+    const post: PostModelInterface = await this.getPostById(_id);
+
+    const { content, updatedAt } = post;
+
+    const updatedPost: PostModelInterface = await Posts.findByIdAndUpdate(
+      _id,
+      {
+        $set: {
+          ..._post,
+          updatedBy: Types.ObjectId(actor),
+          updatedAt: new Date(),
+        },
+
+        $push: {
+          editHistory: {
+            content,
+            updatedAt,
+          },
+          $position: 0,
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return updatedPost;
+  }
+
+  async getPostById(_id: string): Promise<PostModelInterface> {
+    const post: PostModelInterface = await Posts.findById(_id).lean();
+
+    return post;
+  }
 }
 
 export default PostService;
