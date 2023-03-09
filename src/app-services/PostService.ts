@@ -507,6 +507,7 @@ class PostService implements IPostService {
             content: tempComment.content,
             createdAt: tempComment.createdAt,
           },
+          $position: 0,
         },
       },
       { new: true, useFindAndModify: false }

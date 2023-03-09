@@ -234,6 +234,13 @@ export interface IBookService {
     content: string,
     actor: string
   ): Promise<BookModelInterface>;
+
+  editCommentBook(
+    bookId: string,
+    commentId: string,
+    content: string,
+    actor: string
+  ): Promise<BookModelInterface>;
 }
 
 export interface IReportService {

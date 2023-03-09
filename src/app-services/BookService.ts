@@ -571,6 +571,50 @@ class BookService implements IBookService {
 
     return book;
   }
+
+  async editCommentBook(
+    bookId: string,
+    commentId: string,
+    content: string,
+    actor: string
+  ): Promise<BookModelInterface> {
+    const book: BookModelInterface = await this.getBookById(bookId);
+
+    const { comments } = book;
+
+    const tempComment = comments.filter(
+      (item) => String(item._id) === commentId
+    )[0];
+
+    const updatedBook: BookModelInterface = await Books.findOneAndUpdate(
+      {
+        _id: Types.ObjectId(bookId),
+        comments: {
+          $elemMatch: {
+            _id: Types.ObjectId(commentId),
+            createdBy: Types.ObjectId(actor),
+          },
+        },
+      },
+      {
+        $set: {
+          "comments.$.content": content,
+          "comments.$.createdAt": new Date(),
+        },
+
+        $push: {
+          "comments.$.editHistory": {
+            content: tempComment.content,
+            createdAt: tempComment.createdAt,
+          },
+          $position: 0,
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return updatedBook;
+  }
 }
 
 export default BookService;

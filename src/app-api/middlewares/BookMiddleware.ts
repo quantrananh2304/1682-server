@@ -76,6 +76,22 @@ const BookMiddleware = {
 
     body("content").exists({ checkFalsy: true, checkNull: true }).isString(),
   ],
+
+  editComment: [
+    param("bookId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((bookId: string) => isValidObjectId(bookId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    param("commentId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((commentId: string) => isValidObjectId(commentId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("content").exists({ checkFalsy: true, checkNull: true }).isString(),
+  ],
 };
 
 export default BookMiddleware;

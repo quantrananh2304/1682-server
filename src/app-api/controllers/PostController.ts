@@ -175,7 +175,7 @@ class PostController {
         return res.errorRes(CONSTANTS.SERVER_ERROR.COMMENT_NOT_EXIST);
       }
 
-      if (!String(matchedComment.createdBy) === userId) {
+      if (String(matchedComment.createdBy) !== userId) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.CANNOT_EDIT_OTHER_COMMENT);
       }
 

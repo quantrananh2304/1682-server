@@ -172,6 +172,61 @@ class BookController {
       return res.internal({ message: error.errorMessage });
     }
   }
+
+  async editComment(req: Request, res: Response) {
+    try {
+      const { bookId, commentId } = req.params;
+      const { content } = req.body;
+      const { userId } = req.headers;
+
+      const book: BookModelInterface = await this.bookService.getBookById(
+        bookId
+      );
+
+      if (!book || book.hidden.isHidden) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_NOT_EXIST);
+      }
+
+      const { comments } = book;
+
+      const matchedComment = comments.filter(
+        (item) => String(item._id) === commentId
+      )[0];
+
+      if (!matchedComment) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.COMMENT_NOT_EXIST);
+      }
+
+      if (String(matchedComment.createdBy) !== userId) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.CANNOT_EDIT_OTHER_COMMENT);
+      }
+
+      const updatedBook: BookModelInterface =
+        await this.bookService.editCommentBook(
+          bookId,
+          commentId,
+          content,
+          userId
+        );
+
+      if (!updatedBook) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.BOOK,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: bookId,
+        actor: userId,
+        description: "/book/edit-comment",
+      });
+
+      return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
 }
 
 export default BookController;

@@ -177,6 +177,15 @@ router.put(
   BookControllerInstance.commentBook.bind(BookControllerInstance)
 );
 
+router.put(
+  "/book/:bookId/edit-comment/:commentId",
+  BookMiddleware.editComment,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  BookControllerInstance.editComment.bind(BookControllerInstance)
+);
+
 // report
 router.post(
   "/report/create",
