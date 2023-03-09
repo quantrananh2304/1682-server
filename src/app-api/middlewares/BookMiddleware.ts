@@ -66,6 +66,16 @@ const BookMiddleware = {
       )
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.DATE_FORMAT_NOT_VALID),
   ],
+
+  comment: [
+    param("bookId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((postId: string) => isValidObjectId(postId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("content").exists({ checkFalsy: true, checkNull: true }).isString(),
+  ],
 };
 
 export default BookMiddleware;

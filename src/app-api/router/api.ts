@@ -168,6 +168,15 @@ router.put(
   BookControllerInstance.hideBook.bind(BookControllerInstance)
 );
 
+router.put(
+  "/book/:bookId/comment",
+  BookMiddleware.comment,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  BookControllerInstance.commentBook.bind(BookControllerInstance)
+);
+
 // report
 router.post(
   "/report/create",

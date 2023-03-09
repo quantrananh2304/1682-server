@@ -228,6 +228,12 @@ export interface IBookService {
     hiddenUntil: string,
     actor: string
   ): Promise<BookModelInterface>;
+
+  commentBook(
+    bookId: string,
+    content: string,
+    actor: string
+  ): Promise<BookModelInterface>;
 }
 
 export interface IReportService {

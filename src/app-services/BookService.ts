@@ -511,6 +511,7 @@ class BookService implements IBookService {
       Books.aggregate(aggregation),
       Books.find({
         title: { $regex: keyword, $options: "i" },
+        "hidden.isHidden": false,
       }).countDocuments(),
     ]);
 
@@ -539,6 +540,30 @@ class BookService implements IBookService {
           },
           updatedAt: new Date(),
           updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return book;
+  }
+
+  async commentBook(
+    bookId: string,
+    content: string,
+    actor: string
+  ): Promise<BookModelInterface> {
+    const book: BookModelInterface = await Books.findByIdAndUpdate(
+      bookId,
+      {
+        $push: {
+          comments: {
+            content,
+            createdBy: Types.ObjectId(actor),
+            createdAt: new Date(),
+            editHistory: [],
+          },
+          $position: 0,
         },
       },
       { new: true, useFindAndModify: false }
