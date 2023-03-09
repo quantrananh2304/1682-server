@@ -4,6 +4,11 @@ import {
   EVENT_SCHEMA,
   EventModelInterface,
 } from "@app-repositories/models/Events";
+import {
+  REPORT_SCHEMA,
+  REPORT_TYPE,
+  ReportModelInterface,
+} from "@app-repositories/models/Reports";
 import { TopicModelInterface } from "@app-repositories/models/Topics";
 import {
   USER_GENDER,
@@ -189,4 +194,22 @@ export interface IBookService {
     hiddenUntil: string,
     actor: string
   ): Promise<BookModelInterface>;
+}
+
+export interface IReportService {
+  createReport(
+    _report: {
+      title: string;
+      content: string;
+      type: REPORT_TYPE;
+      schema: REPORT_SCHEMA;
+      schemaId: string;
+    },
+    actor: string
+  ): Promise<ReportModelInterface>;
+
+  checkExistReport(
+    schemaId: string,
+    actor: string
+  ): Promise<ReportModelInterface>;
 }

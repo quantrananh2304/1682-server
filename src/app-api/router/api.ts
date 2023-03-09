@@ -1,10 +1,12 @@
 import AuthenticationController from "@app-api/controllers/AuthenticationController";
 import BookController from "@app-api/controllers/BookController";
+import ReportController from "@app-api/controllers/ReportController";
 import TopicController from "@app-api/controllers/TopicController";
 import UserController from "@app-api/controllers/UserController";
 import AuthenticationMiddleware from "@app-api/middlewares/AuthenticationMiddleware";
 import BookMiddleware from "@app-api/middlewares/BookMiddleware";
 import ParamsValidations from "@app-api/middlewares/ParamsValidation";
+import ReportMiddleware from "@app-api/middlewares/ReportMiddleware";
 import TokenValidation from "@app-api/middlewares/Token";
 import TopicMiddleware from "@app-api/middlewares/TopicMiddleware";
 import UserMiddleware from "@app-api/middlewares/UserMiddleware";
@@ -18,6 +20,8 @@ const AuthenticationControllerInstance =
   container.get<AuthenticationController>(AuthenticationController);
 const TopicControllerInstance = container.get<TopicController>(TopicController);
 const BookControllerInstance = container.get<BookController>(BookController);
+const ReportControllerInstance =
+  container.get<ReportController>(ReportController);
 
 router.get("/test", (req, res) => res.send({ status: "OK" }));
 
@@ -141,6 +145,16 @@ router.put(
   TokenValidation.checkToken,
   TokenValidation.checkAuthor,
   BookControllerInstance.hideBook.bind(BookControllerInstance)
+);
+
+// report
+router.post(
+  "/report/create",
+  ReportMiddleware.create,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  ReportControllerInstance.createReport.bind(ReportControllerInstance)
 );
 
 export default router;

@@ -107,6 +107,11 @@ const CONSTANTS = {
       message: "Cannot update others' book",
     },
 
+    REPORT_ALREADY_SUBMITTED: {
+      errorCode: "017",
+      message: "Report or feedback already submitted",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

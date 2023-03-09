@@ -4,6 +4,7 @@ const TYPES = {
   NodeMailer: Symbol.for("NodeMailer"),
   TopicService: Symbol.for("TopicService"),
   BookService: Symbol.for("BookService"),
+  ReportService: Symbol.for("ReportService"),
 };
 
 export default TYPES;

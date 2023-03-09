@@ -10,10 +10,14 @@ export enum REPORT_TYPE {
 }
 
 export enum REPORT_SCHEMA {
-  BOOKS = "BOOKS",
-  POSTS = "POSTS",
-  TOPICS = "TOPICS",
-  USERS = "USERS",
+  books = "books",
+  posts = "posts",
+  users = "users",
+}
+
+export enum REPORT_STATUS {
+  PENDING = "PENDING",
+  RESOLVED = "RESOLVED",
 }
 
 export interface ReportModelInterface extends BaseModelInterface {
@@ -22,6 +26,7 @@ export interface ReportModelInterface extends BaseModelInterface {
   type: REPORT_TYPE;
   schema: REPORT_SCHEMA;
   schemaId: string | Types.ObjectId;
+  status: REPORT_STATUS;
 }
 
 const reportSchema = new Schema({
@@ -65,8 +70,19 @@ const reportSchema = new Schema({
   },
 
   updatedBy: {
-    type: Types.ObjectId && String,
+    type: Types.ObjectId,
     ref: USER_COLLECTION_NAME,
+  },
+
+  createdBy: {
+    type: Types.ObjectId,
+    ref: USER_COLLECTION_NAME,
+  },
+
+  status: {
+    type: REPORT_STATUS,
+    required: true,
+    default: REPORT_STATUS.PENDING,
   },
 });
 
