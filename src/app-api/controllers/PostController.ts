@@ -150,6 +150,53 @@ class PostController {
       return res.internal({ message: error.errorMessage });
     }
   }
+
+  async editComment(req: Request, res: Response) {
+    try {
+      const { postId, commentId } = req.params;
+      const { content } = req.body;
+      const { userId } = req.headers;
+
+      const post: PostModelInterface = await this.postService.getPostById(
+        postId
+      );
+
+      if (!post || post.hidden.isHidden) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.POST_NOT_EXIST);
+      }
+
+      const { comments } = post;
+
+      if (!comments.map((item) => String(item._id)).includes(commentId)) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.COMMENT_NOT_EXIST);
+      }
+
+      const updatedPost: PostModelInterface =
+        await this.postService.editCommentPost(
+          postId,
+          commentId,
+          content,
+          userId
+        );
+
+      if (!updatedPost) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.POST,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: postId,
+        actor: userId,
+        description: "/post/edit-comment",
+      });
+
+      return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
 }
 
 export default PostController;

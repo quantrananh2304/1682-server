@@ -225,4 +225,13 @@ router.put(
   PostControllerInstance.commentPost.bind(PostControllerInstance)
 );
 
+router.put(
+  "/post/:postId/edit-comment/:commentId",
+  PostMiddleware.editComment,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PostControllerInstance.editComment.bind(PostControllerInstance)
+);
+
 export default router;

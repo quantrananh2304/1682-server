@@ -291,4 +291,11 @@ export interface IPostService {
     content: string,
     actor: string
   ): Promise<PostModelInterface>;
+
+  editCommentPost(
+    postId: string,
+    commentId: string,
+    content: string,
+    actor: string
+  ): Promise<PostModelInterface>;
 }

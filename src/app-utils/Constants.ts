@@ -132,6 +132,11 @@ const CONSTANTS = {
       message: "Book not in favorite list",
     },
 
+    COMMENT_NOT_EXIST: {
+      errorCode: "022",
+      message: "Comment not exist",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

@@ -58,6 +58,22 @@ const PostMiddleware = {
 
     body("content").exists({ checkFalsy: true, checkNull: true }).isString(),
   ],
+
+  editComment: [
+    param("postId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((postId: string) => isValidObjectId(postId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    param("commentId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((commentId: string) => isValidObjectId(commentId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("content").exists({ checkFalsy: true, checkNull: true }).isString(),
+  ],
 };
 
 export default PostMiddleware;

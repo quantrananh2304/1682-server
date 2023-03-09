@@ -471,6 +471,49 @@ class PostService implements IPostService {
 
     return post;
   }
+
+  async editCommentPost(
+    postId: string,
+    commentId: string,
+    content: string,
+    actor: string
+  ): Promise<PostModelInterface> {
+    const post: PostModelInterface = await this.getPostById(postId);
+
+    const { comments } = post;
+
+    const tempComment = comments.filter(
+      (item) => String(item._id) === commentId
+    )[0];
+
+    const updatedPost: PostModelInterface = await Posts.findOneAndUpdate(
+      {
+        _id: Types.ObjectId(postId),
+        comments: {
+          $elemMatch: {
+            _id: Types.ObjectId(commentId),
+            createdBy: Types.ObjectId(actor),
+          },
+        },
+      },
+      {
+        $set: {
+          "comments.$.content": content,
+          "comments.$.createdAt": new Date(),
+        },
+
+        $push: {
+          "comments.$.editHistory": {
+            content: tempComment.content,
+            createdAt: tempComment.createdAt,
+          },
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return updatedPost;
+  }
 }
 
 export default PostService;
