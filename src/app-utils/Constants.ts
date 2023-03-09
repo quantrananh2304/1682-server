@@ -127,6 +127,11 @@ const CONSTANTS = {
       message: "Book already in favorite list",
     },
 
+    BOOK_NOT_IN_FAV_LIST: {
+      errorCode: "021",
+      message: "Book not in favorite list",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

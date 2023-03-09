@@ -340,6 +340,55 @@ class UserController {
       return res.internal({ message: error.message });
     }
   }
+
+  async removeFavoriteBook(req: Request, res: Response) {
+    try {
+      const { bookId } = req.params;
+      const { userId } = req.headers;
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      if (!user) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      const book: BookModelInterface = await this.bookService.getBookById(
+        bookId
+      );
+
+      if (!book || book.hidden.isHidden === true) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_NOT_EXIST);
+      }
+
+      const { favorites } = user;
+
+      if (!favorites.map((item) => String(item.book)).includes(bookId)) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_ALREADY_IN_FAV_LIST);
+      }
+
+      const updatedUser: UserModelInterface =
+        await this.userService.removeFavoriteBook(bookId, userId);
+
+      if (!updatedUser) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: userId,
+        actor: userId,
+        description: "/user/remove-favorite",
+      });
+
+      return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
 }
 
 export default UserController;

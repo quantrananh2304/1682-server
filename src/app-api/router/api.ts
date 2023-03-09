@@ -90,6 +90,15 @@ router.put(
   UserControllerInstance.addFavoriteBook.bind(UserControllerInstance)
 );
 
+router.put(
+  "/user/remove-favorite/:bookId",
+  UserMiddleware.removeFavorite,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.removeFavoriteBook.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

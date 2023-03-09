@@ -338,6 +338,33 @@ class UserService implements IUserService {
 
     return user;
   }
+
+  async removeFavoriteBook(
+    bookId: string,
+    actor: string
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      actor,
+      {
+        $set: {
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+
+        $pull: {
+          favorites: {
+            book: Types.ObjectId(bookId),
+          },
+        },
+      },
+      {
+        new: true,
+        useFindAndModify: false,
+      }
+    );
+
+    return user;
+  }
 }
 
 export default UserService;

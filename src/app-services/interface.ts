@@ -138,6 +138,11 @@ export interface IUserService {
   ): Promise<UserModelInterface>;
 
   addFavoriteBook(bookId: string, actor: string): Promise<UserModelInterface>;
+
+  removeFavoriteBook(
+    bookId: string,
+    actor: string
+  ): Promise<UserModelInterface>;
 }
 
 export interface IEventService {
