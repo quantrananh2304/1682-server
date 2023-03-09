@@ -84,6 +84,36 @@ class PostController {
       return res.internal({ message: error.errorMessage });
     }
   }
+
+  async getListPost(req: Request, res: Response) {
+    try {
+      const { page, limit, sort, keyword } = req.query;
+
+      const post = await this.postService.getListPost({
+        page: Number(page) - 1,
+        limit: Number(limit),
+        sort,
+        keyword: keyword || "",
+      });
+
+      if (!post) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.POST,
+        action: EVENT_ACTION.READ,
+        schemaId: null,
+        actor: req.headers.userId,
+        description: "/post/list",
+      });
+
+      return res.successRes({ data: post });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
 }
 
 export default PostController;

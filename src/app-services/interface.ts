@@ -77,6 +77,19 @@ export enum GET_LIST_REPORT_SORT {
   SCHEMA_DESC = "SCHEMA_DESC",
 }
 
+export enum GET_LIST_POST_SORT {
+  LIKE_ASC = "LIKE_ASC",
+  LIKE_DESC = "LIKE_DESC",
+  DISLIKE_ASC = "DISLIKE_ASC",
+  DISLIKE_DESC = "DISLIKE_DESC",
+  VIEW_ASC = "VIEW_ASC",
+  VIEW_DESC = "VIEW_DESC",
+  COMMENT_ASC = "COMMENT_ASC",
+  COMMENT_DESC = "COMMENT_DESC",
+  DATE_CREATED_ASC = "DATE_CREATED_ASC",
+  DATE_CREATED_DESC = "DATE_CREATED_DESC",
+}
+
 export interface IUserService {
   createUser(_user: {
     firstName: string;
@@ -260,4 +273,16 @@ export interface IPostService {
   ): Promise<PostModelInterface>;
 
   getPostById(_id: string): Promise<PostModelInterface>;
+
+  getListPost(filter: {
+    page: number;
+    limit: number;
+    sort: GET_LIST_POST_SORT;
+    keyword: string;
+  }): Promise<{
+    posts: Array<PostModelInterface>;
+    page: number;
+    total: number;
+    totalPage: number;
+  }>;
 }

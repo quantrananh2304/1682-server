@@ -30,6 +30,11 @@ export interface PostModelInterface extends BaseModelInterface {
   }>;
   editHistory: Array<{ content: string; createdAt: Date }>;
   images: Array<string>;
+  hidden: {
+    isHidden: Boolean;
+    hiddenBy: string | Types.ObjectId;
+    hiddenUntil: Date;
+  };
 }
 
 const postSchema = new Schema({
@@ -143,6 +148,16 @@ const postSchema = new Schema({
     type: Types.ObjectId,
     required: true,
     ref: USER_COLLECTION_NAME,
+  },
+
+  hidden: {
+    type: {
+      isHidden: Boolean,
+      hiddenBy: Types.ObjectId,
+      hiddenUntil: Date,
+    },
+    default: { isHidden: false, hiddenBy: null, hiddenUntil: null },
+    required: true,
   },
 });
 

@@ -207,4 +207,13 @@ router.put(
   PostControllerInstance.editPost.bind(PostControllerInstance)
 );
 
+router.get(
+  "/post/list",
+  PostMiddleware.getListPost,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PostControllerInstance.getListPost.bind(PostControllerInstance)
+);
+
 export default router;
