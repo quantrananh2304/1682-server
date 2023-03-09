@@ -246,6 +246,12 @@ export interface IBookService {
     bookId: string,
     commentId: string
   ): Promise<BookModelInterface>;
+
+  likeDislikeBook(
+    bookId: string,
+    action: "like" | "dislike",
+    actor: string
+  ): Promise<BookModelInterface>;
 }
 
 export interface IReportService {

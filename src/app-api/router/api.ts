@@ -195,6 +195,15 @@ router.delete(
   BookControllerInstance.deleteComment.bind(BookControllerInstance)
 );
 
+router.put(
+  "/book/:bookId/like-dislike/:action",
+  BookMiddleware.likeDislikeBook,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  BookControllerInstance.likeDislikeBook.bind(BookControllerInstance)
+);
+
 // report
 router.post(
   "/report/create",

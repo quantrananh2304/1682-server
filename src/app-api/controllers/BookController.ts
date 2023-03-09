@@ -285,6 +285,44 @@ class BookController {
       return res.internal({ message: error.errorMessage });
     }
   }
+
+  async likeDislikeBook(req: Request, res: Response) {
+    try {
+      const { bookId, action } = req.params;
+
+      const book: BookModelInterface = await this.bookService.getBookById(
+        bookId
+      );
+
+      if (!book || book.hidden.isHidden) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_NOT_EXIST);
+      }
+
+      const updatedBook: BookModelInterface =
+        await this.bookService.likeDislikeBook(
+          bookId,
+          action,
+          req.headers.userId
+        );
+
+      if (!updatedBook) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.BOOK,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: bookId,
+        actor: req.headers.userId,
+        description: "/book/like-dislike",
+      });
+
+      return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
 }
 
 export default BookController;

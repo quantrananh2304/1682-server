@@ -641,6 +641,78 @@ class BookService implements IBookService {
 
     return book;
   }
+
+  async likeDislikeBook(
+    bookId: string,
+    action: "like" | "dislike",
+    actor: string
+  ): Promise<BookModelInterface> {
+    const book: BookModelInterface = await this.getBookById(bookId);
+
+    const { like, dislike } = book;
+
+    let update = {};
+
+    if (action === "like") {
+      if (like.map((item) => String(item.user)).includes(actor)) {
+        update = {
+          $pull: {
+            like: {
+              user: Types.ObjectId(actor),
+            },
+          },
+        };
+      } else {
+        update = {
+          $push: {
+            like: {
+              user: Types.ObjectId(actor),
+              createdAt: new Date(),
+            },
+          },
+
+          $pull: {
+            dislike: {
+              user: Types.ObjectId(actor),
+            },
+          },
+        };
+      }
+    } else {
+      if (dislike.map((item) => String(item.user)).includes(actor)) {
+        update = {
+          $pull: {
+            dislike: {
+              user: Types.ObjectId(actor),
+            },
+          },
+        };
+      } else {
+        update = {
+          $push: {
+            dislike: {
+              user: Types.ObjectId(actor),
+              createdAt: new Date(),
+            },
+          },
+
+          $pull: {
+            like: {
+              user: Types.ObjectId(actor),
+            },
+          },
+        };
+      }
+    }
+
+    const updatedBook: BookModelInterface = await Books.findByIdAndUpdate(
+      bookId,
+      update,
+      { new: true, useFindAndModify: false }
+    );
+
+    return updatedBook;
+  }
 }
 
 export default BookService;
