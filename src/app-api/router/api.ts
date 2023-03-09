@@ -252,4 +252,13 @@ router.put(
   PostControllerInstance.likeDislikePost.bind(PostControllerInstance)
 );
 
+router.put(
+  "/post/:postId/view",
+  PostMiddleware.viewPost,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PostControllerInstance.viewPost.bind(PostControllerInstance)
+);
+
 export default router;

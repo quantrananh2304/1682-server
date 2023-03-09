@@ -292,6 +292,43 @@ class PostController {
       return res.internal({ message: error.errorMessage });
     }
   }
+
+  async viewPost(req: Request, res: Response) {
+    try {
+      const { postId } = req.params;
+      const { userId } = req.headers;
+
+      const post: PostModelInterface = await this.postService.getPostById(
+        postId
+      );
+
+      if (!post || post.hidden.isHidden) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.POST_NOT_EXIST);
+      }
+
+      const updatedPost: PostModelInterface = await this.postService.viewPost(
+        postId,
+        userId
+      );
+
+      if (!updatedPost) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.POST,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: postId,
+        actor: userId,
+        description: "/post/view",
+      });
+
+      return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
 }
 
 export default PostController;

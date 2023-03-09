@@ -310,4 +310,6 @@ export interface IPostService {
     action: "like" | "dislike",
     actor: string
   ): Promise<PostModelInterface>;
+
+  viewPost(postId: string, actor: string): Promise<PostModelInterface>;
 }

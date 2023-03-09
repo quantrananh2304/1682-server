@@ -102,6 +102,14 @@ const PostMiddleware = {
       .custom((action: string) => action === "like" || action === "dislike")
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.ACTION_INVALID),
   ],
+
+  viewPost: [
+    param("postId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((postId: string) => isValidObjectId(postId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
 };
 
 export default PostMiddleware;

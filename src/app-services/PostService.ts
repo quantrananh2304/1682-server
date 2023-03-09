@@ -416,8 +416,8 @@ class PostService implements IPostService {
 
           viewCount: {
             $cond: {
-              if: { $isArray: "$view" },
-              then: { $size: "$view" },
+              if: { $isArray: "$views" },
+              then: { $size: "$views" },
               else: 0,
             },
           },
@@ -614,6 +614,24 @@ class PostService implements IPostService {
     );
 
     return updatedPost;
+  }
+
+  async viewPost(postId: string, actor: string): Promise<PostModelInterface> {
+    const post: PostModelInterface = await Posts.findByIdAndUpdate(
+      postId,
+      {
+        $push: {
+          views: {
+            user: Types.ObjectId(actor),
+            createdAt: new Date(),
+          },
+          $position: 0,
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return post;
   }
 }
 
