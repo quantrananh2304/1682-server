@@ -5,6 +5,7 @@ const TYPES = {
   TopicService: Symbol.for("TopicService"),
   BookService: Symbol.for("BookService"),
   ReportService: Symbol.for("ReportService"),
+  PostService: Symbol.for("PostService"),
 };
 
 export default TYPES;

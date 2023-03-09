@@ -4,6 +4,7 @@ import {
   EVENT_SCHEMA,
   EventModelInterface,
 } from "@app-repositories/models/Events";
+import { PostModelInterface } from "@app-repositories/models/Posts";
 import {
   REPORT_SCHEMA,
   REPORT_TYPE,
@@ -237,4 +238,11 @@ export interface IReportService {
     total: number;
     totalPage: number;
   }>;
+}
+
+export interface IPostService {
+  createPost(
+    _post: { content: string; images: Array<string> },
+    actor: string
+  ): Promise<PostModelInterface>;
 }

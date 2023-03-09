@@ -29,6 +29,7 @@ export interface PostModelInterface extends BaseModelInterface {
     }>;
   }>;
   editHistory: Array<{ content: string; createdAt: Date }>;
+  images: Array<string>;
 }
 
 const postSchema = new Schema({
@@ -111,6 +112,37 @@ const postSchema = new Schema({
     ],
     default: [],
     _id: false,
+  },
+
+  images: [
+    {
+      type: String,
+      default: [],
+    },
+  ],
+
+  createdAt: {
+    type: Date,
+    default: new Date(),
+    required: true,
+  },
+
+  updatedAt: {
+    type: Date,
+    default: new Date(),
+    required: true,
+  },
+
+  createdBy: {
+    type: Types.ObjectId,
+    required: true,
+    ref: USER_COLLECTION_NAME,
+  },
+
+  updatedBy: {
+    type: Types.ObjectId,
+    required: true,
+    ref: USER_COLLECTION_NAME,
   },
 });
 

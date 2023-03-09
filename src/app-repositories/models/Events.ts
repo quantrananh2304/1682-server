@@ -8,6 +8,7 @@ export enum EVENT_SCHEMA {
   TOPIC = "TOPIC",
   BOOK = "BOOK",
   REPORT = "REPORT",
+  POST = "POST",
 }
 
 export enum EVENT_ACTION {

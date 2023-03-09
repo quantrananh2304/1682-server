@@ -1,11 +1,13 @@
 import AuthenticationController from "@app-api/controllers/AuthenticationController";
 import BookController from "@app-api/controllers/BookController";
+import PostController from "@app-api/controllers/PostController";
 import ReportController from "@app-api/controllers/ReportController";
 import TopicController from "@app-api/controllers/TopicController";
 import UserController from "@app-api/controllers/UserController";
 import AuthenticationMiddleware from "@app-api/middlewares/AuthenticationMiddleware";
 import BookMiddleware from "@app-api/middlewares/BookMiddleware";
 import ParamsValidations from "@app-api/middlewares/ParamsValidation";
+import PostMiddleware from "@app-api/middlewares/PostMiddleware";
 import ReportMiddleware from "@app-api/middlewares/ReportMiddleware";
 import TokenValidation from "@app-api/middlewares/Token";
 import TopicMiddleware from "@app-api/middlewares/TopicMiddleware";
@@ -22,6 +24,7 @@ const TopicControllerInstance = container.get<TopicController>(TopicController);
 const BookControllerInstance = container.get<BookController>(BookController);
 const ReportControllerInstance =
   container.get<ReportController>(ReportController);
+const PostControllerInstance = container.get<PostController>(PostController);
 
 router.get("/test", (req, res) => res.send({ status: "OK" }));
 
@@ -165,6 +168,16 @@ router.get(
   TokenValidation.checkToken,
   TokenValidation.checkAdmin,
   ReportControllerInstance.getListReport.bind(ReportControllerInstance)
+);
+
+// post
+router.post(
+  "/post/create",
+  PostMiddleware.create,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PostControllerInstance.createPost.bind(PostControllerInstance)
 );
 
 export default router;
