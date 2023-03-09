@@ -120,6 +120,14 @@ const BookMiddleware = {
       .custom((action: string) => action === "like" || action === "dislike")
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.ACTION_INVALID),
   ],
+
+  viewBook: [
+    param("bookId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((bookId: string) => isValidObjectId(bookId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
 };
 
 export default BookMiddleware;

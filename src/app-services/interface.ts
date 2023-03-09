@@ -252,6 +252,8 @@ export interface IBookService {
     action: "like" | "dislike",
     actor: string
   ): Promise<BookModelInterface>;
+
+  viewBook(bookId: string, actor: string): Promise<BookModelInterface>;
 }
 
 export interface IReportService {

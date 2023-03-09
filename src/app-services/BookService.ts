@@ -713,6 +713,24 @@ class BookService implements IBookService {
 
     return updatedBook;
   }
+
+  async viewBook(bookId: string, actor: string): Promise<BookModelInterface> {
+    const book: BookModelInterface = await Books.findByIdAndUpdate(
+      bookId,
+      {
+        $push: {
+          views: {
+            user: Types.ObjectId(actor),
+            createdAt: new Date(),
+          },
+          $position: 0,
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return book;
+  }
 }
 
 export default BookService;

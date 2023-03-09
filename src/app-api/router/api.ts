@@ -204,6 +204,15 @@ router.put(
   BookControllerInstance.likeDislikeBook.bind(BookControllerInstance)
 );
 
+router.put(
+  "/book/:bookId/view",
+  BookMiddleware.viewBook,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  BookControllerInstance.viewBook.bind(BookControllerInstance)
+);
+
 // report
 router.post(
   "/report/create",
