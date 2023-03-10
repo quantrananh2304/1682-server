@@ -678,6 +678,24 @@ class UserService implements IUserService {
 
     return user;
   }
+
+  async followUser(userId: string, actor: string): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      actor,
+      {
+        $push: {
+          following: {
+            user: Types.ObjectId(userId),
+            createdAt: new Date(),
+          },
+          $position: 0,
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return user;
+  }
 }
 
 export default UserService;

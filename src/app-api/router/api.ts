@@ -117,6 +117,15 @@ router.put(
   UserControllerInstance.editProfile.bind(UserControllerInstance)
 );
 
+router.put(
+  "/user/follow/:userId",
+  UserMiddleware.followUser,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.followUser.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

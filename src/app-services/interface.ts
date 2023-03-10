@@ -170,6 +170,8 @@ export interface IUserService {
       gender: USER_GENDER | string;
     }
   ): Promise<UserModelInterface>;
+
+  followUser(userId: string, actor: string): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

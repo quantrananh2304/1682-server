@@ -147,6 +147,11 @@ const CONSTANTS = {
       message: "Cannot delete others' comment",
     },
 
+    USER_ALREADY_IN_FOLLOW_LIST: {
+      errorCode: "025",
+      message: "Already followed this user",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

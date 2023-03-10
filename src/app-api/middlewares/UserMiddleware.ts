@@ -246,6 +246,13 @@ const UserMiddleware = {
 
     body("gender").exists({ checkFalsy: true, checkNull: true }).isString(),
   ],
+
+  followUser: [
+    param("userId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .custom((userId: string) => isValidObjectId(userId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
 };
 
 export default UserMiddleware;
