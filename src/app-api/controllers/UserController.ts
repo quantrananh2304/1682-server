@@ -416,6 +416,59 @@ class UserController {
       return res.internal({ message: error.message });
     }
   }
+
+  async editProfile(req: Request, res: Response) {
+    try {
+      const { userId } = req.headers;
+      const { firstName, lastName, avatar, address, dob, gender } = req.body;
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      if (!user) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      const updatedUser: UserModelInterface =
+        await this.userService.editProfile(userId, {
+          firstName,
+          lastName,
+          avatar,
+          address,
+          dob,
+          gender,
+        });
+
+      if (!updatedUser) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: userId,
+        actor: userId,
+        description: "/user/edit",
+      });
+
+      return res.successRes({
+        data: {
+          _id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          avatar: user.avatar,
+          role: user.role,
+          address: user.address,
+          dob: user.dob,
+          gender: user.gender,
+        },
+      });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
 }
 
 export default UserController;

@@ -158,6 +158,18 @@ export interface IUserService {
   ): Promise<UserModelInterface>;
 
   getUserProfile(userId: string): Promise<UserModelInterface>;
+
+  editProfile(
+    userId: string,
+    _user: {
+      firstName: string;
+      lastName: string;
+      avatar: string;
+      address: string;
+      dob: string;
+      gender: USER_GENDER | string;
+    }
+  ): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

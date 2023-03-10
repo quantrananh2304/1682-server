@@ -652,6 +652,32 @@ class UserService implements IUserService {
 
     return user[0];
   }
+
+  async editProfile(
+    userId: string,
+    _user: {
+      firstName: string;
+      lastName: string;
+      avatar: string;
+      address: string;
+      dob: string;
+      gender: USER_GENDER | string;
+    }
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          ..._user,
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(userId),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return user;
+  }
 }
 
 export default UserService;

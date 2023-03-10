@@ -108,6 +108,15 @@ router.get(
   UserControllerInstance.getUserProfile.bind(UserControllerInstance)
 );
 
+router.put(
+  "/user/edit-profile",
+  UserMiddleware.editProfile,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.editProfile.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",
