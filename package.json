@@ -15,7 +15,9 @@
     "staging": "NODE_ENV=staging ts-node -C ttypescript src/index.ts",
     "staging-windows": "yarn install&& SET NODE_ENV=staging&& ts-node -C ttypescript src/index.ts",
     "production": "NODE_ENV=production ts-node -C ttypescript src/index.ts",
-    "production-windows": "yarn install&& SET NODE_ENV=production&& ts-node -C ttypescript src/index.ts"
+    "production-windows": "yarn install&& SET NODE_ENV=production&& ts-node -C ttypescript src/index.ts",
+    "start": "node dist/index.js",
+    "run": "node dist/index.js"
   },
   "engines": {
     "node": ">=14.0.0"
