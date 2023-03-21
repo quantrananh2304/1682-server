@@ -6,7 +6,7 @@ const CONSTANTS = {
   ACCOUNT_REGISTERED: "Register Successfully",
 
   ACCOUNT_REGISTERED_BODY:
-    "<p>Your account {user.username} has been registered successfully. You can login to <a href=onemorepage.com><b>One more page</b></a> using your username or email.</p>",
+    "<p>Your account has been registered successfully. You can login to <a href=onemorepage.com><b>One more page</b></a> using your email.</p>",
 
   RESET_PASSWORD: "Reset password code",
 
@@ -34,7 +34,7 @@ const CONSTANTS = {
   SERVER_ERROR: {
     USER_EXISTED: {
       errorCode: "01",
-      message: "Email, username or phone number already in use",
+      message: "Email or phone number already in use",
     },
 
     USER_NOT_EXIST: {
@@ -49,7 +49,7 @@ const CONSTANTS = {
 
     LOGIN_INFO_INVALID: {
       errorCode: "04",
-      message: "Wrong username or password",
+      message: "Wrong email or password",
     },
 
     INTERNAL_EMAIL_ERROR: {
@@ -150,6 +150,11 @@ const CONSTANTS = {
     USER_ALREADY_IN_FOLLOW_LIST: {
       errorCode: "025",
       message: "Already followed this user",
+    },
+
+    USER_NOT_IN_FOLLOW_LIST: {
+      errorCode: "026",
+      message: "User not followed",
     },
 
     AUTHORIZATION_UNAUTHORIZED: {

@@ -15,11 +15,6 @@ const UserMiddleware = {
       .isString()
       .isLength({ max: 50 }),
 
-    body("username")
-      .exists({ checkFalsy: true, checkNull: true })
-      .isString()
-      .isLength({ max: 50 }),
-
     body("email")
       .exists({ checkFalsy: true, checkNull: true })
       .isString()
@@ -40,7 +35,7 @@ const UserMiddleware = {
       .isLength({ max: 255 }),
 
     body("dob")
-      .exists({ checkFalsy: true, checkNull: true })
+      .exists({ checkNull: true, checkFalsy: true })
       .isString()
       .custom((dob: string) => !isNaN(Date.parse(dob)))
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.DATE_FORMAT_NOT_VALID),
@@ -49,10 +44,10 @@ const UserMiddleware = {
       .exists({ checkFalsy: true, checkNull: true })
       .isString(),
 
-    body("gender").exists({ checkFalsy: true, checkNull: true }).isString(),
+    body("gender").exists({ checkNull: true, checkFalsy: true }).isString(),
 
     body("password")
-      .exists({ checkFalsy: true, checkNull: true })
+      .exists({ checkNull: true })
       .isString()
       .isLength({
         min: CONSTANTS.PASSWORD_MIN_LENGTH,
@@ -248,6 +243,13 @@ const UserMiddleware = {
   ],
 
   followUser: [
+    param("userId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .custom((userId: string) => isValidObjectId(userId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
+
+  unfollowUser: [
     param("userId")
       .exists({ checkFalsy: true, checkNull: true })
       .custom((userId: string) => isValidObjectId(userId))

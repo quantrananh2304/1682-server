@@ -25,7 +25,6 @@ export enum USER_ROLE {
 export interface UserModelInterface extends BaseModelInterface {
   firstName: string;
   lastName: string;
-  username: string;
   email: string;
   avatar: string;
   password: string;
@@ -57,7 +56,6 @@ const userSchema = new Schema({
 
   username: {
     type: String,
-    required: true,
     default: "",
   },
 

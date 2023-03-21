@@ -20,8 +20,6 @@ import { Types } from "mongoose";
 export enum GET_LIST_USER_SORT {
   NAME_ASC = "NAME_ASC",
   NAME_DESC = "NAME_DESC",
-  USERNAME_ASC = "USERNAME_ASC",
-  USERNAME_DESC = "USERNAME_DESC",
   EMAIL_ASC = "EMAIL_ASC",
   EMAIL_DESC = "EMAIL_DESC",
   ROLE_ASC = "ROLE_ASC",
@@ -94,7 +92,6 @@ export interface IUserService {
   createUser(_user: {
     firstName: string;
     lastName: string;
-    username: string;
     email: string;
     password: string;
     address: string;
@@ -104,16 +101,11 @@ export interface IUserService {
   }): Promise<UserModelInterface>;
 
   checkUserExisted(_user: {
-    username: string;
     email: string;
     phoneNumber: string;
   }): Promise<boolean>;
 
-  getUserByEmailUsernamePhoneNumber(_user: {
-    username: string;
-    email: string;
-    phoneNumber: string;
-  }): Promise<UserModelInterface>;
+  getUserByEmail(_user: { email: string }): Promise<UserModelInterface>;
 
   updatePassword(
     userId: string | Types.ObjectId,
@@ -172,6 +164,10 @@ export interface IUserService {
   ): Promise<UserModelInterface>;
 
   followUser(userId: string, actor: string): Promise<UserModelInterface>;
+
+  unfollowUser(userId: string, actor: string): Promise<UserModelInterface>;
+
+  getAdminAccount(): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

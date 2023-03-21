@@ -35,11 +35,9 @@ class NodeMailer {
   ) {
     try {
       const mainOptions = {
-        // thiết lập đối tượng, nội dung gửi mail
         from: SOURCE,
         to: toAddresses,
         subject: subject,
-        // text: body, //Thường thi mình không dùng cái này thay vào đó mình sử dụng html để dễ edit hơn
         html: body,
       };
 

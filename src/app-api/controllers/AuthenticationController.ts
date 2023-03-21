@@ -20,14 +20,17 @@ class AuthenticationController {
 
   async login(req: Request, res: Response) {
     try {
-      const { username, password } = req.body;
+      const { email, password } = req.body;
 
-      const user: UserModelInterface =
-        await this.userService.getUserByEmailUsernamePhoneNumber({
-          username,
-          email: username,
-          phoneNumber: username,
+      let user: UserModelInterface;
+
+      if (email === "admin") {
+        user = await this.userService.getAdminAccount();
+      } else {
+        user = await this.userService.getUserByEmail({
+          email,
         });
+      }
 
       if (!user) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);

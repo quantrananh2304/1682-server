@@ -16,7 +16,6 @@ class UserService implements IUserService {
   async createUser(_user: {
     firstName: string;
     lastName: string;
-    username: string;
     email: string;
     password: string;
     address: string;
@@ -48,14 +47,13 @@ class UserService implements IUserService {
   }
 
   async checkUserExisted(_user: {
-    username: string;
     email: string;
     phoneNumber: string;
   }): Promise<boolean> {
-    const { username, email, phoneNumber } = _user;
+    const { email, phoneNumber } = _user;
 
     const user: Array<UserModelInterface> = await Users.find({
-      $or: [{ username }, { email }, { phoneNumber }],
+      $or: [{ email }, { phoneNumber }],
     });
 
     if (user.length) {
@@ -65,15 +63,11 @@ class UserService implements IUserService {
     return false;
   }
 
-  async getUserByEmailUsernamePhoneNumber(_user: {
-    username: string;
-    email: string;
-    phoneNumber: string;
-  }): Promise<UserModelInterface> {
-    const { username, email, phoneNumber } = _user;
+  async getUserByEmail(_user: { email: string }): Promise<UserModelInterface> {
+    const { email } = _user;
 
     const user: UserModelInterface = await Users.findOne({
-      $or: [{ username }, { email }, { phoneNumber }],
+      email,
     });
 
     return user;
@@ -230,14 +224,6 @@ class UserService implements IUserService {
         sort = { role: -1 };
         break;
 
-      case GET_LIST_USER_SORT.USERNAME_ASC:
-        sort = { username: 1 };
-        break;
-
-      case GET_LIST_USER_SORT.USERNAME_DESC:
-        sort = { username: -1 };
-        break;
-
       default:
         break;
     }
@@ -249,7 +235,6 @@ class UserService implements IUserService {
             $or: [
               { firstName: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
-              { username: { $regex: keyword, $options: "i" } },
               { email: { $regex: keyword, $options: "i" } },
               { phoneNumber: { $regex: keyword, $options: "i" } },
             ],
@@ -269,7 +254,6 @@ class UserService implements IUserService {
             $or: [
               { firstName: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
-              { username: { $regex: keyword, $options: "i" } },
               { email: { $regex: keyword, $options: "i" } },
               { phoneNumber: { $regex: keyword, $options: "i" } },
             ],
@@ -598,7 +582,6 @@ class UserService implements IUserService {
           _id: 1,
           firstName: 1,
           lastName: 1,
-          username: 1,
           email: 1,
           avatar: 1,
           status: 1,
@@ -693,6 +676,53 @@ class UserService implements IUserService {
       },
       { new: true, useFindAndModify: false }
     );
+
+    if (user) {
+      await Users.findByIdAndUpdate(userId, {
+        $push: {
+          followers: {
+            user: Types.ObjectId(actor),
+            createdAt: new Date(),
+          },
+          $position: 0,
+        },
+      });
+    }
+
+    return user;
+  }
+
+  async unfollowUser(
+    userId: string,
+    actor: string
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      actor,
+      {
+        $pull: {
+          following: {
+            user: Types.ObjectId(userId),
+          },
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    if (user) {
+      await Users.findByIdAndUpdate(userId, {
+        $pull: {
+          followers: {
+            user: Types.ObjectId(userId),
+          },
+        },
+      });
+    }
+
+    return user;
+  }
+
+  async getAdminAccount(): Promise<UserModelInterface> {
+    const user = await Users.findOne({ username: "admin" }).lean();
 
     return user;
   }

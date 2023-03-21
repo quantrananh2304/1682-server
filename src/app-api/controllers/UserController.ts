@@ -28,7 +28,6 @@ class UserController {
     try {
       const {
         email,
-        username,
         phoneNumber,
         firstName,
         lastName,
@@ -40,7 +39,6 @@ class UserController {
 
       const isExisted: boolean = await this.userService.checkUserExisted({
         email,
-        username,
         phoneNumber,
       });
 
@@ -51,7 +49,6 @@ class UserController {
       const user: UserModelInterface = await this.userService.createUser({
         firstName,
         lastName,
-        username,
         email,
         password,
         address,
@@ -62,10 +59,7 @@ class UserController {
 
       const title = CONSTANTS.ACCOUNT_REGISTERED;
 
-      const body = CONSTANTS.ACCOUNT_REGISTERED_BODY.replace(
-        "{user.username}",
-        username
-      );
+      const body = CONSTANTS.ACCOUNT_REGISTERED_BODY;
 
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.USER,
@@ -134,12 +128,9 @@ class UserController {
     try {
       const { email } = req.params;
 
-      const user: UserModelInterface =
-        await this.userService.getUserByEmailUsernamePhoneNumber({
-          username: "",
-          email,
-          phoneNumber: "",
-        });
+      const user: UserModelInterface = await this.userService.getUserByEmail({
+        email,
+      });
 
       if (!user) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
@@ -492,10 +483,10 @@ class UserController {
         return res.internal({});
       }
 
-      const { followers } = actor;
+      const { following } = actor;
 
       if (
-        followers.map((item) => String(item.user)).includes(req.params.userId)
+        following.map((item) => String(item.user)).includes(req.params.userId)
       ) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.USER_ALREADY_IN_FOLLOW_LIST);
       }
@@ -508,6 +499,77 @@ class UserController {
       if (!updatedUser) {
         return res.internal({});
       }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: req.headers.userId,
+        actor: req.headers.userId,
+        description: "/user/follow",
+      });
+
+      return res.successRes({
+        data: {
+          _id: updatedUser._id,
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+          avatar: updatedUser.avatar,
+          role: updatedUser.role,
+          address: updatedUser.address,
+          dob: updatedUser.dob,
+          gender: updatedUser.gender,
+          following: updatedUser.following,
+        },
+      });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async unfollowUser(req: Request, res: Response) {
+    try {
+      const user: UserModelInterface = await this.userService.getUserById(
+        req.params.userId
+      );
+
+      if (!user || user.status !== USER_STATUS.ACTIVE) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      const actor: UserModelInterface = await this.userService.getUserById(
+        req.headers.userId
+      );
+
+      if (!actor) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      const { following } = actor;
+
+      if (
+        !following.map((item) => String(item.user)).includes(req.params.userId)
+      ) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_IN_FOLLOW_LIST);
+      }
+
+      const updatedUser: UserModelInterface =
+        await this.userService.unfollowUser(
+          req.params.userId,
+          req.headers.userId
+        );
+
+      if (!updatedUser) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: req.headers.userId,
+        actor: req.headers.userId,
+        description: "/user/unfollow",
+      });
 
       return res.successRes({
         data: {
