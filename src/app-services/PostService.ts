@@ -609,7 +609,7 @@ class PostService implements IPostService {
       postId,
       update,
       { new: true, useFindAndModify: false }
-    );
+    ).lean();
 
     return updatedPost;
   }

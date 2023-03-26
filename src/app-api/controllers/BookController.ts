@@ -309,6 +309,13 @@ class BookController {
         return res.internal({});
       }
 
+      const likeCount = updatedBook.like.length;
+      const dislikeCount = updatedBook.dislike.length;
+      const viewCount = updatedBook.views.length;
+      const commentCount = updatedBook.comments.length;
+      const chapterCount = updatedBook.chapters.length;
+      const subscriberCount = updatedBook.subscribedUsers.length;
+
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.BOOK,
         action: EVENT_ACTION.UPDATE,
@@ -317,7 +324,17 @@ class BookController {
         description: "/book/like-dislike",
       });
 
-      return res.successRes({ data: {} });
+      return res.successRes({
+        data: {
+          ...updatedBook,
+          likeCount,
+          dislikeCount,
+          viewCount,
+          commentCount,
+          chapterCount,
+          subscriberCount,
+        },
+      });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });

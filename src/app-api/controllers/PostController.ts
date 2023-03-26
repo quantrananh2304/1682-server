@@ -288,6 +288,11 @@ class PostController {
         return res.internal({});
       }
 
+      const likeCount = updatedPost.like.length;
+      const dislikeCount = updatedPost.dislike.length;
+      const viewCount = updatedPost.views.length;
+      const commentCount = updatedPost.comments.length;
+
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.POST,
         action: EVENT_ACTION.UPDATE,
@@ -296,7 +301,15 @@ class PostController {
         description: "/post/like-dislike",
       });
 
-      return res.successRes({ data: {} });
+      return res.successRes({
+        data: {
+          ...updatedPost,
+          likeCount,
+          dislikeCount,
+          viewCount,
+          commentCount,
+        },
+      });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });

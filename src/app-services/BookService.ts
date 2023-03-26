@@ -709,7 +709,7 @@ class BookService implements IBookService {
       bookId,
       update,
       { new: true, useFindAndModify: false }
-    );
+    ).lean();
 
     return updatedBook;
   }
