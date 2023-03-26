@@ -206,22 +206,22 @@ class BookService implements IBookService {
                     user: {
                       _id: {
                         $arrayElemAt: [
-                          "$dislikeBy._id",
-                          { $indexOfArray: ["$dislikeBy._id", "$$this.user"] },
+                          "$dislikedBy._id",
+                          { $indexOfArray: ["$dislikedBy._id", "$$this.user"] },
                         ],
                       },
 
                       firstName: {
                         $arrayElemAt: [
-                          "$dislikeBy.firstName",
-                          { $indexOfArray: ["$dislikeBy._id", "$$this.user"] },
+                          "$dislikedBy.firstName",
+                          { $indexOfArray: ["$dislikedBy._id", "$$this.user"] },
                         ],
                       },
 
                       lastName: {
                         $arrayElemAt: [
-                          "$dislikeBy.lastName",
-                          { $indexOfArray: ["$dislikeBy._id", "$$this.user"] },
+                          "$dislikedBy.lastName",
+                          { $indexOfArray: ["$dislikedBy._id", "$$this.user"] },
                         ],
                       },
                     },
@@ -230,7 +230,7 @@ class BookService implements IBookService {
               },
             },
           },
-          dislikeBy: "$$REMOVE",
+          dislikedBy: "$$REMOVE",
         },
       },
 
@@ -709,7 +709,25 @@ class BookService implements IBookService {
       bookId,
       update,
       { new: true, useFindAndModify: false }
-    ).lean();
+    )
+      .populate({ path: "like.user", select: "firstName lastName _id avatar" })
+      .populate({
+        path: "dislike.user",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "comments.createdBy",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "views.user",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "subscribedUsers.user",
+        select: "firstName lastName _id avatar",
+      })
+      .lean();
 
     return updatedBook;
   }
