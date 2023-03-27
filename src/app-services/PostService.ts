@@ -623,6 +623,7 @@ class PostService implements IPostService {
         path: "views.user",
         select: "firstName lastName _id avatar",
       })
+      .populate({ path: "updatedBy", select: "firstName lastName _id avatar" })
       .lean();
 
     return updatedPost;

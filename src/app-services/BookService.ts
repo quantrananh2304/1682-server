@@ -727,6 +727,8 @@ class BookService implements IBookService {
         path: "subscribedUsers.user",
         select: "firstName lastName _id avatar",
       })
+      .populate({ path: "updatedBy", select: "firstName lastName _id avatar" })
+      .populate({ path: "topics", select: "name note _id" })
       .lean();
 
     return updatedBook;
