@@ -751,6 +751,32 @@ class BookService implements IBookService {
 
     return book;
   }
+
+  async getBookDetail(bookId: string): Promise<BookModelInterface> {
+    const book: BookModelInterface = await Books.findById(bookId)
+      .populate({ path: "like.user", select: "firstName lastName _id avatar" })
+      .populate({
+        path: "dislike.user",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "comments.createdBy",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "views.user",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "subscribedUsers.user",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({ path: "updatedBy", select: "firstName lastName _id avatar" })
+      .populate({ path: "topics", select: "name note _id" })
+      .lean();
+
+    return book;
+  }
 }
 
 export default BookService;

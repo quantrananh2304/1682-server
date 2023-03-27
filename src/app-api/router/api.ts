@@ -249,6 +249,15 @@ router.put(
   BookControllerInstance.viewBook.bind(BookControllerInstance)
 );
 
+router.get(
+  "/book",
+  BookMiddleware.getDetail,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  BookControllerInstance.getBookDetail.bind(BookControllerInstance)
+);
+
 // report
 router.post(
   "/report/create",

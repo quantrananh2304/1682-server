@@ -266,6 +266,8 @@ export interface IBookService {
   ): Promise<BookModelInterface>;
 
   viewBook(bookId: string, actor: string): Promise<BookModelInterface>;
+
+  getBookDetail(bookId: string): Promise<BookModelInterface>;
 }
 
 export interface IReportService {

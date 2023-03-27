@@ -377,6 +377,33 @@ class BookController {
       return res.internal({ message: error.errorMessage });
     }
   }
+
+  async getBookDetail(req: Request, res: Response) {
+    try {
+      const { bookId } = req.query;
+
+      const book: BookModelInterface = await this.bookService.getBookDetail(
+        bookId
+      );
+
+      if (book.hidden.isHidden) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_NOT_EXIST);
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.BOOK,
+        action: EVENT_ACTION.READ,
+        schemaId: bookId,
+        actor: req.headers.userId,
+        description: "/book/detail",
+      });
+
+      return res.successRes({ data: book });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
 }
 
 export default BookController;
