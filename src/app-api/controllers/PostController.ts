@@ -1,10 +1,11 @@
 import { Request, Response } from "@app-helpers/http.extends";
 import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
 import { PostModelInterface } from "@app-repositories/models/Posts";
-import { USER_ROLE } from "@app-repositories/models/Users";
+import { USER_ROLE, UserModelInterface } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import EventService from "@app-services/EventService";
 import PostService from "@app-services/PostService";
+import UserService from "@app-services/UserService";
 import CONSTANTS from "@app-utils/Constants";
 import { inject, injectable } from "inversify";
 
@@ -12,6 +13,7 @@ import { inject, injectable } from "inversify";
 class PostController {
   @inject(TYPES.PostService) private readonly postService: PostService;
   @inject(TYPES.EventService) private readonly eventService: EventService;
+  @inject(TYPES.UserService) private readonly userService: UserService;
 
   async createPost(req: Request, res: Response) {
     try {
@@ -347,6 +349,45 @@ class PostController {
       });
 
       return res.successRes({ data: {} });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  async getPostDetail(req: Request, res: Response) {
+    try {
+      const { postId } = req.query;
+      const { userId } = req.headers;
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      const post: PostModelInterface = await this.postService.getPostDetail(
+        postId
+      );
+
+      if (!post || (post.hidden.isHidden && user.role !== USER_ROLE.ADMIN)) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.POST_NOT_EXIST);
+      }
+
+      const likeCount = post.like.length;
+      const dislikeCount = post.dislike.length;
+      const viewCount = post.views.length;
+      const commentCount = post.comments.length;
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.POST,
+        action: EVENT_ACTION.READ,
+        schemaId: postId,
+        actor: userId,
+        description: "/post/detail",
+      });
+
+      return res.successRes({
+        data: { ...post, likeCount, dislikeCount, viewCount, commentCount },
+      });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });

@@ -646,6 +646,27 @@ class PostService implements IPostService {
 
     return post;
   }
+
+  async getPostDetail(postId: string): Promise<PostModelInterface> {
+    const post: PostModelInterface = await Posts.findById(postId)
+      .populate({ path: "like.user", select: "firstName lastName _id avatar" })
+      .populate({
+        path: "dislike.user",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "comments.createdBy",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "views.user",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({ path: "updatedBy", select: "firstName lastName _id avatar" })
+      .lean();
+
+    return post;
+  }
 }
 
 export default PostService;

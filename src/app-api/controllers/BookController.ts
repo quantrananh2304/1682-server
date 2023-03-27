@@ -2,11 +2,12 @@ import { Request, Response } from "@app-helpers/http.extends";
 import { BookModelInterface } from "@app-repositories/models/Books";
 import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
 import { TopicModelInterface } from "@app-repositories/models/Topics";
-import { USER_ROLE } from "@app-repositories/models/Users";
+import { USER_ROLE, UserModelInterface } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import BookService from "@app-services/BookService";
 import EventService from "@app-services/EventService";
 import TopicService from "@app-services/TopicService";
+import UserService from "@app-services/UserService";
 import CONSTANTS from "@app-utils/Constants";
 import { inject, injectable } from "inversify";
 
@@ -15,6 +16,7 @@ class BookController {
   @inject(TYPES.BookService) private readonly bookService: BookService;
   @inject(TYPES.EventService) private readonly eventService: EventService;
   @inject(TYPES.TopicService) private readonly topicService: TopicService;
+  @inject(TYPES.UserService) private readonly userService: UserService;
 
   async createBook(req: Request, res: Response) {
     try {
@@ -382,13 +384,24 @@ class BookController {
     try {
       const { bookId } = req.query;
 
+      const user: UserModelInterface = await this.userService.getUserById(
+        req.headers.userId
+      );
+
       const book: BookModelInterface = await this.bookService.getBookDetail(
         bookId
       );
 
-      if (book.hidden.isHidden) {
+      if (!book || (book.hidden.isHidden && user.role !== USER_ROLE.ADMIN)) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_NOT_EXIST);
       }
+
+      const likeCount = book.like.length;
+      const dislikeCount = book.dislike.length;
+      const viewCount = book.views.length;
+      const commentCount = book.comments.length;
+      const chapterCount = book.chapters.length;
+      const subscriberCount = book.subscribedUsers.length;
 
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.BOOK,
@@ -398,7 +411,17 @@ class BookController {
         description: "/book/detail",
       });
 
-      return res.successRes({ data: book });
+      return res.successRes({
+        data: {
+          ...book,
+          likeCount,
+          dislikeCount,
+          viewCount,
+          chapterCount,
+          commentCount,
+          subscriberCount,
+        },
+      });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });

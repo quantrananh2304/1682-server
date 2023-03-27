@@ -351,4 +351,13 @@ router.put(
   PostControllerInstance.viewPost.bind(PostControllerInstance)
 );
 
+router.get(
+  "/post",
+  PostMiddleware.getPostDetail,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PostControllerInstance.getPostDetail.bind(PostControllerInstance)
+);
+
 export default router;
