@@ -17,10 +17,10 @@ class PostController {
 
   async createPost(req: Request, res: Response) {
     try {
-      const { content, images } = req.body;
+      const { content, images, isAnonymous } = req.body;
 
       const post: PostModelInterface = await this.postService.createPost(
-        { content, images },
+        { content, images, isAnonymous },
         req.headers.userId
       );
 
@@ -53,7 +53,7 @@ class PostController {
         postId
       );
 
-      if (!post) {
+      if (!post || post.hidden.isHidden) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.POST_NOT_EXIST);
       }
 
@@ -73,6 +73,11 @@ class PostController {
         return res.internal({});
       }
 
+      const likeCount = updatedPost.like.length;
+      const dislikeCount = updatedPost.dislike.length;
+      const viewCount = updatedPost.views.length;
+      const commentCount = updatedPost.comments.length;
+
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.POST,
         action: EVENT_ACTION.UPDATE,
@@ -81,7 +86,16 @@ class PostController {
         description: "/post/update",
       });
 
-      return res.successRes({ data: updatedPost });
+      return res.successRes({
+        data: {
+          ...updatedPost,
+          likeCount,
+          dislikeCount,
+          viewCount,
+          commentCount,
+          updatedBy: updatedPost.isAnonymous ? {} : updatedPost.updatedBy,
+        },
+      });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });
@@ -111,7 +125,17 @@ class PostController {
         description: "/post/list",
       });
 
-      return res.successRes({ data: post });
+      return res.successRes({
+        data: {
+          ...post,
+          posts: post.posts.map((item) => {
+            return {
+              ...item,
+              updatedBy: item.isAnonymous ? {} : item.updatedBy,
+            };
+          }),
+        },
+      });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });
@@ -310,6 +334,7 @@ class PostController {
           dislikeCount,
           viewCount,
           commentCount,
+          updatedBy: updatedPost.isAnonymous ? {} : updatedPost.updatedBy,
         },
       });
     } catch (error) {
@@ -386,7 +411,14 @@ class PostController {
       });
 
       return res.successRes({
-        data: { ...post, likeCount, dislikeCount, viewCount, commentCount },
+        data: {
+          ...post,
+          likeCount,
+          dislikeCount,
+          viewCount,
+          commentCount,
+          updatedBy: post.isAnonymous ? {} : post.updatedBy,
+        },
       });
     } catch (error) {
       console.log("error", error);

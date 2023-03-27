@@ -6,10 +6,10 @@ import { Types } from "mongoose";
 @injectable()
 class PostService implements IPostService {
   async createPost(
-    _post: { content: string; images: string[] },
+    _post: { content: string; images: string[]; isAnonymous: boolean },
     actor: string
   ): Promise<PostModelInterface> {
-    const { content, images } = _post;
+    const { content, images, isAnonymous } = _post;
 
     const post: PostModelInterface = await Posts.create({
       content,
@@ -28,6 +28,7 @@ class PostService implements IPostService {
         hiddenBy: null,
         hiddenUntil: null,
       },
+      isAnonymous,
     });
 
     return post;
@@ -60,7 +61,22 @@ class PostService implements IPostService {
         },
       },
       { new: true, useFindAndModify: false }
-    );
+    )
+      .populate({ path: "like.user", select: "firstName lastName _id avatar" })
+      .populate({
+        path: "dislike.user",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "comments.createdBy",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({
+        path: "views.user",
+        select: "firstName lastName _id avatar",
+      })
+      .populate({ path: "updatedBy", select: "firstName lastName _id avatar" })
+      .lean();
 
     return updatedPost;
   }
