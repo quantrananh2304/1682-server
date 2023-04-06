@@ -187,6 +187,19 @@ const UserMiddleware = {
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.SORT_OPTION_INVALID),
   ],
 
+  getListFollower: [
+    query("page").exists({ checkNull: true }).isInt({ min: 1 }),
+
+    query("limit")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isInt({ min: 5 }),
+
+    query("userId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .custom((userId: string) => isValidObjectId(userId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
+
   warnUser: [
     param("userId")
       .exists({ checkFalsy: true, checkNull: true })

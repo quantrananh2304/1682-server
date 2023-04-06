@@ -135,6 +135,15 @@ router.put(
   UserControllerInstance.unfollowUser.bind(UserControllerInstance)
 );
 
+router.get(
+  "/user/follows",
+  UserMiddleware.getListFollower,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.getListFollowers.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

@@ -589,6 +589,33 @@ class UserController {
       return res.internal({ message: error.message });
     }
   }
+
+  async getListFollowers(req: Request, res: Response) {
+    try {
+      const { userId, limit, page } = req.query;
+
+      const user = await this.userService.getListFollowers(userId);
+
+      if (!user || user.status !== USER_STATUS.ACTIVE) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      const { followers, following } = user;
+
+      const skipStart = Number(page - 1) * Number(limit);
+      const skipEnd = skipStart + Number(limit);
+
+      return res.successRes({
+        data: {
+          followers: followers.slice(skipStart, skipEnd),
+          following: following.slice(skipStart, skipEnd),
+        },
+      });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
 }
 
 export default UserController;

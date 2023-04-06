@@ -168,6 +168,8 @@ export interface IUserService {
   unfollowUser(userId: string, actor: string): Promise<UserModelInterface>;
 
   getAdminAccount(): Promise<UserModelInterface>;
+
+  getListFollowers(userId: string): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

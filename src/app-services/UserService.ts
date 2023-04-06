@@ -726,6 +726,20 @@ class UserService implements IUserService {
 
     return user;
   }
+
+  async getListFollowers(userId: string): Promise<UserModelInterface> {
+    const user = await Users.findById(userId)
+      .populate({
+        path: "followers.user",
+        select: "_id firstName lastName avatar",
+      })
+      .populate({
+        path: "following.user",
+        select: "_id firstName lastName avatar",
+      });
+
+    return user;
+  }
 }
 
 export default UserService;
