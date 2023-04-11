@@ -6,7 +6,11 @@ import { Types } from "mongoose";
 @injectable()
 class PostService implements IPostService {
   async createPost(
-    _post: { content: string; images: string[]; isAnonymous: boolean },
+    _post: {
+      content: string;
+      images: Array<{ url: string; name: string; contentType: string }>;
+      isAnonymous: boolean;
+    },
     actor: string
   ): Promise<PostModelInterface> {
     const { content, images, isAnonymous } = _post;

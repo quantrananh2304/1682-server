@@ -120,12 +120,23 @@ const postSchema = new Schema({
     _id: false,
   },
 
-  images: [
-    {
-      type: String,
-      default: [],
-    },
-  ],
+  // images: [
+  //   {
+  //     type: String,
+  //     default: [],
+  //   },
+  // ],
+
+  images: {
+    type: [
+      {
+        contentType: String,
+        name: String,
+        url: String,
+      },
+    ],
+    default: [],
+  },
 
   createdAt: {
     type: Date,

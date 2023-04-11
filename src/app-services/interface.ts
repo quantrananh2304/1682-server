@@ -304,7 +304,11 @@ export interface IReportService {
 
 export interface IPostService {
   createPost(
-    _post: { content: string; images: Array<string>; isAnonymous: boolean },
+    _post: {
+      content: string;
+      images: Array<{ contentType: string; url: string; name: string }>;
+      isAnonymous: boolean;
+    },
     actor: string
   ): Promise<PostModelInterface>;
 

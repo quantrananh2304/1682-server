@@ -11,7 +11,15 @@ const PostMiddleware = {
     body("images")
       .exists({})
       .isArray({ min: 0 })
-      .custom((images: Array<any>) => images.every((item) => _.isString(item))),
+      .custom((images: Array<any>) =>
+        images.every((item) => {
+          if (item.url && item.name && item.contentType) {
+            return true;
+          }
+
+          return false;
+        })
+      ),
 
     body("isAnonymous").exists({ checkNull: true }).isBoolean(),
   ],
