@@ -40,7 +40,10 @@ class PostService implements IPostService {
 
   async editPost(
     _id: string,
-    _post: { content: string; images: string[] },
+    _post: {
+      content: string;
+      images: Array<{ contentType: string; url: string; name: string }>;
+    },
     actor: string
   ): Promise<PostModelInterface> {
     const post: PostModelInterface = await this.getPostById(_id);

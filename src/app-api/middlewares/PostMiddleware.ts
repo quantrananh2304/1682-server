@@ -1,7 +1,7 @@
 import { GET_LIST_POST_SORT } from "@app-services/interface";
 import CONSTANTS from "@app-utils/Constants";
 import { body, param, query } from "express-validator";
-import _ = require("lodash");
+// import _ = require("lodash");
 import { isValidObjectId } from "mongoose";
 
 const PostMiddleware = {
@@ -36,7 +36,15 @@ const PostMiddleware = {
     body("images")
       .exists({})
       .isArray({ min: 0 })
-      .custom((images: Array<any>) => images.every((item) => _.isString(item))),
+      .custom((images: Array<any>) =>
+        images.every((item) => {
+          if (item.url && item.name && item.contentType) {
+            return true;
+          }
+
+          return false;
+        })
+      ),
   ],
 
   getListPost: [

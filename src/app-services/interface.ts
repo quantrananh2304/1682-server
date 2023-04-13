@@ -314,7 +314,10 @@ export interface IPostService {
 
   editPost(
     _id: string,
-    _post: { content: string; images: Array<string> },
+    _post: {
+      content: string;
+      images: Array<{ contentType: string; url: string; name: string }>;
+    },
     actor: string
   ): Promise<PostModelInterface>;
 
