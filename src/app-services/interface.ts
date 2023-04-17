@@ -363,4 +363,6 @@ export interface IPostService {
   viewPost(postId: string, actor: string): Promise<PostModelInterface>;
 
   getPostDetail(postId: string): Promise<PostModelInterface>;
+
+  getListPostByUserId(userId: string): Promise<Array<PostModelInterface>>;
 }

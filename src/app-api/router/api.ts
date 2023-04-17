@@ -144,6 +144,14 @@ router.get(
   UserControllerInstance.getListFollowers.bind(UserControllerInstance)
 );
 
+router.get(
+  "/user/post/list",
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.getListPost.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

@@ -16,6 +16,8 @@ import { RANDOM_TOKEN_SECRET } from "@app-configs";
 import BookService from "@app-services/BookService";
 import NodeMailer from "@app-repositories/smtp";
 import { BookModelInterface } from "@app-repositories/models/Books";
+import { PostModelInterface } from "@app-repositories/models/Posts";
+import PostService from "@app-services/PostService";
 
 @injectable()
 class UserController {
@@ -23,6 +25,7 @@ class UserController {
   @inject(TYPES.EventService) private readonly eventService: EventService;
   @inject(TYPES.NodeMailer) private readonly nodeMailer: NodeMailer;
   @inject(TYPES.BookService) private readonly bookService: BookService;
+  @inject(TYPES.PostService) private readonly postService: PostService;
 
   async register(req: Request, res: Response) {
     try {
@@ -610,6 +613,31 @@ class UserController {
           followers: followers.slice(skipStart, skipEnd),
           following: following.slice(skipStart, skipEnd),
         },
+      });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async getListPost(req: Request, res: Response) {
+    try {
+      const { userId } = req.headers;
+
+      const posts: Array<PostModelInterface> =
+        await this.postService.getListPostByUserId(userId);
+
+      if (!posts) {
+        return res.internal({});
+      }
+
+      return res.successRes({
+        data: posts.map((item) => {
+          return {
+            ...item,
+            updatedBy: item.isAnonymous ? {} : item.updatedBy,
+          };
+        }),
       });
     } catch (error) {
       console.log("error", error);

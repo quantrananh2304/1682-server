@@ -36,6 +36,7 @@ export interface PostModelInterface extends BaseModelInterface {
     hiddenUntil: Date;
   };
   isAnonymous: boolean;
+  updatedBy: string | Types.ObjectId;
 }
 
 const postSchema = new Schema({
