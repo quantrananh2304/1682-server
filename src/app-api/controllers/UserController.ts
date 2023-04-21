@@ -704,21 +704,27 @@ class UserController {
       }
 
       if (res.io) {
-        [userId, receiver].forEach((item) => {
-          res.io.emit(item, {
-            from: {
-              _id: userId,
-              messages: updatedUser.messages.filter(
-                (item) => String(item.receiver) === receiver
-              ),
-            },
-            to: {
-              _id: receiver,
-              messages: updatedReceiver.messages.filter(
-                (item) => String(item.receiver) === userId
-              ),
-            },
-          });
+        // [userId, receiver].forEach((item) => {
+        //   res.io.emit(item, {
+        //     // from: {
+        //     //   _id: userId,
+        //     //   messages: updatedUser.messages.filter(
+        //     //     (item) => String(item.receiver) === receiver
+        //     //   ),
+        //     // },
+        //     // to: {
+        //     //   _id: receiver,
+        //     //   messages: updatedReceiver.messages.filter(
+        //     //     (item) => String(item.receiver) === userId
+        //     //   ),
+        //     // },
+        //   });
+        // });
+
+        res.io.emit(receiver, {
+          messages: updatedReceiver.messages.filter(
+            (item) => String(item.receiver) === userId
+          )[0],
         });
       }
 
