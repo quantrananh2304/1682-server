@@ -704,19 +704,21 @@ class UserController {
       }
 
       if (res.io) {
-        res.io.emit(CONSTANTS.IO_EVENT.SEND_MESSAGE, {
-          from: {
-            _id: userId,
-            messages: updatedUser.messages.filter(
-              (item) => String(item.receiver) === receiver
-            ),
-          },
-          to: {
-            _id: receiver,
-            messages: updatedReceiver.messages.filter(
-              (item) => String(item.receiver) === userId
-            ),
-          },
+        [userId, receiver].forEach((item) => {
+          res.io.emit(item, {
+            from: {
+              _id: userId,
+              messages: updatedUser.messages.filter(
+                (item) => String(item.receiver) === receiver
+              ),
+            },
+            to: {
+              _id: receiver,
+              messages: updatedReceiver.messages.filter(
+                (item) => String(item.receiver) === userId
+              ),
+            },
+          });
         });
       }
 

@@ -1,23 +1,16 @@
+/* eslint-disable */
+
 import "reflect-metadata";
 import * as express from "express";
 import * as cors from "cors";
 import * as helmet from "helmet";
 import { httpResponse } from "@app-helpers";
 import { api } from "@app-api/router";
-// eslint-disable-next-line
 const http = require("http");
-// eslint-disable-next-line
-const { Server } = require("socket.io");
-
-//const server = express();
 const app = express();
-
 const server = http.createServer(app);
-const io = new Server(server, {
-  allowRequest: (req, callback) => {
-    callback(null, true);
-  },
-});
+const { Server } = require("socket.io");
+const io = new Server(server, { cors: { origin: "*" } });
 
 // check cors
 // const whitelistCORS = [
@@ -25,13 +18,6 @@ const io = new Server(server, {
 //   SERVER_URL,
 //   "http://localhost:3000/",
 // ];
-
-io.on("connection", (socket) => {
-  console.log("user connected");
-  socket.on("connect", () => {
-    io.emit("chat message");
-  });
-});
 
 app.use((req: any, res: any, next) => {
   res.io = io;
@@ -65,4 +51,4 @@ app.use(express.urlencoded({ extended: true, limit: "100mb" }));
 app.use(httpResponse);
 app.use("/api", api);
 
-export default app;
+export default server;
