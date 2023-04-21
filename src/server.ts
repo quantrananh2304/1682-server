@@ -18,11 +18,11 @@ const app = express();
 //   "http://localhost:3000/",
 // ];
 
-// io.on("connection", (socket) => {
-//   socket.on("chat message", (msg) => {
-//     io.emit("chat message", msg);
-//   });
-// });
+io.on("connection", (socket) => {
+  socket.on("connect", () => {
+    io.emit("chat message");
+  });
+});
 
 app.use((req: any, res: any, next) => {
   res.io = io;
