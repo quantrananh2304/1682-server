@@ -13,7 +13,11 @@ const { Server } = require("socket.io");
 const app = express();
 
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "http://127.0.0.1:5174" } });
+const io = new Server(server, {
+  allowRequest: (req, callback) => {
+    callback(null, true);
+  },
+});
 
 // check cors
 // const whitelistCORS = [
@@ -23,6 +27,7 @@ const io = new Server(server, { cors: { origin: "http://127.0.0.1:5174" } });
 // ];
 
 io.on("connection", (socket) => {
+  console.log("user connected");
   socket.on("connect", () => {
     io.emit("chat message");
   });
