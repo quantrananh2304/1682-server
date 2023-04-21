@@ -4,12 +4,16 @@ import * as cors from "cors";
 import * as helmet from "helmet";
 import { httpResponse } from "@app-helpers";
 import { api } from "@app-api/router";
-import server from "http";
 // eslint-disable-next-line
-const io = require("socket.io")(server);
+const http = require("http");
+// eslint-disable-next-line
+const { Server } = require("socket.io");
 
 //const server = express();
 const app = express();
+
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "http://127.0.0.1:5174" } });
 
 // check cors
 // const whitelistCORS = [
