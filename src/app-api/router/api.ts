@@ -152,6 +152,24 @@ router.get(
   UserControllerInstance.getListPost.bind(UserControllerInstance)
 );
 
+router.put(
+  "/user/chat/:receiver",
+  UserMiddleware.sendMessages,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.sendMessages.bind(UserControllerInstance)
+);
+
+router.get(
+  "/user/messages",
+  UserMiddleware.getChatMessages,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.getMessages.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

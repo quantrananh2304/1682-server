@@ -170,6 +170,12 @@ export interface IUserService {
   getAdminAccount(): Promise<UserModelInterface>;
 
   getListFollowers(userId: string): Promise<UserModelInterface>;
+
+  sendMessage(
+    fromId: string,
+    toId: string,
+    content: string
+  ): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

@@ -157,6 +157,11 @@ const CONSTANTS = {
       message: "User not followed",
     },
 
+    USER_NOT_FOLLOWED_OR_FOLLOWING: {
+      errorCode: "027",
+      message: "User not in following or follower list",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",
@@ -182,6 +187,10 @@ const CONSTANTS = {
     SORT_OPTION_INVALID: "Sort option invalid",
 
     ACTION_INVALID: "Action invalid",
+  },
+
+  IO_EVENT: {
+    SEND_MESSAGE: "SEND_MESSAGE",
   },
 };
 

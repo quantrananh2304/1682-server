@@ -89,6 +89,8 @@ export interface Response extends ResponseEX {
 
   status: any;
   json: any;
+
+  io?: any;
 }
 
 export interface Request extends RequestEX {
@@ -114,6 +116,7 @@ export interface Request extends RequestEX {
   url: string;
 
   baseUrl: string;
+  io?: any;
 }
 
 const errorFormatter = (error) => {

@@ -608,6 +608,14 @@ class UserController {
       const skipStart = Number(page - 1) * Number(limit);
       const skipEnd = skipStart + Number(limit);
 
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.READ,
+        schemaId: userId,
+        description: "user/get-list-followers-following",
+        actor: userId,
+      });
+
       return res.successRes({
         data: {
           followers: followers.slice(skipStart, skipEnd),
@@ -631,6 +639,14 @@ class UserController {
         return res.internal({});
       }
 
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.READ,
+        schemaId: userId,
+        description: "user/get-list-post",
+        actor: userId,
+      });
+
       return res.successRes({
         data: posts.map((item) => {
           return {
@@ -639,6 +655,119 @@ class UserController {
           };
         }),
       });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async sendMessages(req: Request, res: Response) {
+    try {
+      const { userId } = req.headers;
+      const { receiver } = req.params;
+      const { content } = req.body;
+
+      const receiverUser: UserModelInterface =
+        await this.userService.getUserById(receiver);
+
+      if (!receiverUser || receiverUser.status !== USER_STATUS.ACTIVE) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      const { following, followers } = user;
+
+      if (
+        !followers.map((item) => String(item.user)).includes(receiver) ||
+        !following.map((item) => String(item.user)).includes(receiver)
+      ) {
+        return res.errorRes(
+          CONSTANTS.SERVER_ERROR.USER_NOT_FOLLOWED_OR_FOLLOWING
+        );
+      }
+
+      const updatedUser: UserModelInterface =
+        await this.userService.sendMessage(userId, receiver, content);
+
+      if (!updatedUser) {
+        return res.internal({});
+      }
+
+      const updatedReceiver: UserModelInterface =
+        await this.userService.getUserById(receiver);
+
+      if (!updatedReceiver) {
+        return res.internal({});
+      }
+
+      if (res.io) {
+        res.io.emit(CONSTANTS.IO_EVENT.SEND_MESSAGE, {
+          from: {
+            _id: userId,
+            messages: updatedUser.messages.filter(
+              (item) => String(item.receiver) === receiver
+            ),
+          },
+          to: {
+            _id: receiver,
+            messages: updatedReceiver.messages.filter(
+              (item) => String(item.receiver) === userId
+            ),
+          },
+        });
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.UPDATE,
+        actor: userId,
+        description: "user/chat",
+        schemaId: userId,
+      });
+
+      return res.successRes({
+        data: updatedUser.messages.filter(
+          (item) => String(item.receiver) === receiver
+        ),
+      });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async getMessages(req: Request, res: Response) {
+    try {
+      const { receiver } = req.query;
+      const { userId } = req.headers;
+
+      const receiverUser: UserModelInterface =
+        await this.userService.getUserById(receiver);
+
+      if (!receiverUser || receiverUser.status !== USER_STATUS.ACTIVE) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      const messages = user.messages.filter(
+        (item) => String(item.receiver) === receiver
+      );
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.READ,
+        schemaId: userId,
+        actor: userId,
+        description: "user/get-chat-message",
+      });
+
+      return res.successRes({ data: messages });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.message });

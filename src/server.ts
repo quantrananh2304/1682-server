@@ -4,6 +4,9 @@ import * as cors from "cors";
 import * as helmet from "helmet";
 import { httpResponse } from "@app-helpers";
 import { api } from "@app-api/router";
+import server from "http";
+// eslint-disable-next-line
+const io = require("socket.io")(server);
 
 //const server = express();
 const app = express();
@@ -14,6 +17,19 @@ const app = express();
 //   SERVER_URL,
 //   "http://localhost:3000/",
 // ];
+
+// io.on("connection", (socket) => {
+//   socket.on("chat message", (msg) => {
+//     io.emit("chat message", msg);
+//   });
+// });
+
+app.use((req: any, res: any, next) => {
+  res.io = io;
+  next();
+});
+
+app.get("/", (req, res) => res.send("hello"));
 
 const corsOptions = {
   origin: function (origin: string, callback: any) {

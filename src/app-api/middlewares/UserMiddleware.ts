@@ -268,6 +268,22 @@ const UserMiddleware = {
       .custom((userId: string) => isValidObjectId(userId))
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
   ],
+
+  sendMessages: [
+    param("receiver")
+      .exists({ checkFalsy: true, checkNull: true })
+      .custom((userId: string) => isValidObjectId(userId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("content").exists({ checkFalsy: true, checkNull: true }).isString(),
+  ],
+
+  getChatMessages: [
+    query("receiver")
+      .exists({ checkFalsy: true, checkNull: true })
+      .custom((userId: string) => isValidObjectId(userId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
 };
 
 export default UserMiddleware;

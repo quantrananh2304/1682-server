@@ -740,6 +740,101 @@ class UserService implements IUserService {
 
     return user;
   }
+
+  async sendMessage(
+    // from
+    userId: string,
+    // to
+    receiverId: string,
+    content: string
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findById(userId);
+
+    const { messages } = user;
+    let updates: any = {};
+    const matcher: any = {
+      _id: Types.ObjectId(userId),
+    };
+
+    const alreadyChat: boolean = messages
+      .map((item) => String(item.receiver))
+      .includes(receiverId);
+
+    if (alreadyChat) {
+      updates = {
+        $push: {
+          "messages.$.messages": {
+            content,
+            from: Types.ObjectId(userId),
+            createdAt: new Date(),
+          },
+        },
+      };
+
+      matcher.messages = {
+        $elemMatch: {
+          receiver: Types.ObjectId(receiverId),
+        },
+      };
+    } else {
+      updates = {
+        $push: {
+          messages: {
+            receiver: Types.ObjectId(receiverId),
+            messages: [
+              {
+                content,
+                from: Types.ObjectId(userId),
+                createdAt: new Date(),
+              },
+            ],
+          },
+        },
+      };
+    }
+
+    const updatedUser: UserModelInterface = await Users.findOneAndUpdate(
+      matcher,
+      updates,
+      { new: true, useFindAndModify: false }
+    );
+
+    await Users.findOneAndUpdate(
+      alreadyChat
+        ? {
+            _id: Types.ObjectId(receiverId),
+            messages: { $elemMatch: { receiver: Types.ObjectId(userId) } },
+          }
+        : { _id: Types.ObjectId(receiverId) },
+      alreadyChat
+        ? {
+            $push: {
+              "messages.$.messages": {
+                content,
+                from: Types.ObjectId(userId),
+                createdAt: new Date(),
+              },
+            },
+          }
+        : {
+            $push: {
+              messages: {
+                receiver: Types.ObjectId(userId),
+                messages: [
+                  {
+                    content,
+                    from: Types.ObjectId(userId),
+                    createdAt: new Date(),
+                  },
+                ],
+              },
+            },
+          },
+      { new: true, useFindAndModify: false }
+    );
+
+    return updatedUser;
+  }
 }
 
 export default UserService;
