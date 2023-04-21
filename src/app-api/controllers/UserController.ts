@@ -733,7 +733,7 @@ class UserController {
       return res.successRes({
         data: updatedUser.messages.filter(
           (item) => String(item.receiver) === receiver
-        ),
+        )[0],
       });
     } catch (error) {
       console.log("error", error);
@@ -759,7 +759,7 @@ class UserController {
 
       const messages = user.messages.filter(
         (item) => String(item.receiver) === receiver
-      );
+      )[0];
 
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.USER,
