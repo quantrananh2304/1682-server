@@ -35,7 +35,7 @@ export interface BookModelInterface extends BaseModelInterface {
       createdAt: Date;
     }>;
   }>;
-  topics: string | Types.ObjectId;
+  topics: Array<string | Types.ObjectId | any>;
   subscribedUsers: Array<{
     user: string | Types.ObjectId;
     createdAt: Date;
@@ -169,15 +169,18 @@ const bookSchema = new Schema({
     required: true,
     default: new Date(),
   },
+
   updatedAt: {
     type: Date,
     required: true,
     default: new Date(),
   },
+
   updatedBy: {
     type: Types.ObjectId,
     ref: "users",
   },
+
   createdBy: {
     type: Types.ObjectId,
     ref: "users",

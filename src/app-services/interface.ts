@@ -282,6 +282,11 @@ export interface IBookService {
   viewBook(bookId: string, actor: string): Promise<BookModelInterface>;
 
   getBookDetail(bookId: string): Promise<BookModelInterface>;
+
+  getBookByDate(
+    startDate: Date,
+    endDate: Date
+  ): Promise<Array<BookModelInterface>>;
 }
 
 export interface IReportService {

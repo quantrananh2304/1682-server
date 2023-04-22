@@ -5,5 +5,5 @@ export interface BaseModelInterface {
   createdAt: Date;
   createdBy?: string | Types.ObjectId;
   updatedAt: Date;
-  updatedBy?: string | Types.ObjectId;
+  updatedBy?: string | Types.ObjectId | any;
 }

@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import { GET_LIST_BOOK_SORT, IBookService } from "./interface";
 import Books, { BookModelInterface } from "@app-repositories/models/Books";
 import { Types } from "mongoose";
+import { isSameDay } from "date-fns";
 
 @injectable()
 class BookService implements IBookService {
@@ -776,6 +777,40 @@ class BookService implements IBookService {
       .lean();
 
     return book;
+  }
+
+  async getBookByDate(
+    startDate: Date,
+    endDate: Date
+  ): Promise<BookModelInterface[]> {
+    let matcher: any;
+
+    if (isSameDay(new Date(startDate), new Date(endDate))) {
+      matcher = { createdAt: new Date(startDate) };
+    } else {
+      matcher = {
+        $and: [
+          {
+            createdAt: {
+              $gte: new Date(startDate),
+            },
+          },
+          {
+            createdAt: {
+              $lte: new Date(endDate),
+            },
+          },
+        ],
+      };
+    }
+
+    const books = await Books.find(matcher)
+      .sort({ createdAt: 1 })
+      .populate({ path: "updatedBy", select: "_id firstName lastName" })
+      .populate({ path: "topics", select: "_id name" })
+      .lean();
+
+    return books;
   }
 }
 

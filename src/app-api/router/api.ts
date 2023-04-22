@@ -310,6 +310,15 @@ router.get(
   BookControllerInstance.getBookDetail.bind(BookControllerInstance)
 );
 
+router.get(
+  "/admin/dashboard",
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkAdmin,
+  TokenValidation.checkToken,
+  BookControllerInstance.adminDashboard.bind(BookControllerInstance)
+);
+
 // report
 router.post(
   "/report/create",

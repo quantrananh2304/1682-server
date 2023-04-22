@@ -9,6 +9,7 @@ import EventService from "@app-services/EventService";
 import TopicService from "@app-services/TopicService";
 import UserService from "@app-services/UserService";
 import CONSTANTS from "@app-utils/Constants";
+import { endOfYear, format, getYear, startOfYear, sub } from "date-fns";
 import { inject, injectable } from "inversify";
 
 @injectable()
@@ -420,6 +421,125 @@ class BookController {
           chapterCount,
           commentCount,
           subscriberCount,
+        },
+      });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  async adminDashboard(req: Request, res: Response) {
+    try {
+      const today: Date = new Date();
+      const todayLastYear: Date = sub(today, { years: 1 });
+      const firstDateOfYear: Date = startOfYear(today);
+      const todayLastTwoYear: Date = sub(today, { years: 2 });
+      const todayLastThreeYear: Date = sub(today, { years: 3 });
+      const todayLastFourYear: Date = sub(today, { years: 4 });
+
+      const bookInRecentYear: Array<BookModelInterface> =
+        await this.bookService.getBookByDate(todayLastYear, today);
+
+      if (!bookInRecentYear) {
+        return res.internal({});
+      }
+
+      const [
+        bookInThisYear,
+        bookInLastYear,
+        bookInLastTwoYear,
+        bookInLastThreeYear,
+        bookInLastFourYear,
+      ] = await Promise.all([
+        this.bookService.getBookByDate(firstDateOfYear, today),
+        this.bookService.getBookByDate(
+          startOfYear(todayLastYear),
+          endOfYear(todayLastYear)
+        ),
+        this.bookService.getBookByDate(
+          startOfYear(todayLastTwoYear),
+          endOfYear(todayLastTwoYear)
+        ),
+        this.bookService.getBookByDate(
+          startOfYear(todayLastThreeYear),
+          endOfYear(todayLastThreeYear)
+        ),
+        this.bookService.getBookByDate(
+          startOfYear(todayLastFourYear),
+          endOfYear(todayLastFourYear)
+        ),
+      ]);
+
+      if (
+        !bookInThisYear ||
+        !bookInLastYear ||
+        !bookInLastTwoYear ||
+        !bookInLastThreeYear ||
+        !bookInLastFourYear
+      ) {
+        return res.internal({});
+      }
+
+      return res.successRes({
+        data: {
+          numberAuthorByMonth: bookInRecentYear.reduce((prev, cur) => {
+            const { updatedBy, createdAt, topics } = cur;
+
+            const month = format(new Date(createdAt), "LLL");
+
+            if (!prev[month]) {
+              prev[month] = {
+                author: [updatedBy],
+                authorCount: 1,
+                topics: topics.reduce((prevTopic, curTopic) => {
+                  const { _id, name } = curTopic;
+
+                  if (
+                    !prevTopic
+                      .map((item: any) => String(item._id))
+                      .includes(_id)
+                  ) {
+                    prevTopic.push({ _id, name, bookCount: 1 });
+                  } else {
+                    prevTopic[
+                      prevTopic
+                        .map((item: any) => String(item._id))
+                        .indexOf(String(_id))
+                    ].bookCount += 1;
+                  }
+
+                  return prevTopic;
+                }, []),
+              };
+            } else if (
+              !prev[month].author
+                .map((item: any) => String(item._id))
+                .includes(String(updatedBy._id))
+            ) {
+              prev[month].author.push(updatedBy);
+              prev[month].authorCount += 1;
+            }
+
+            return prev;
+          }, {}),
+
+          totalBookEachYear: [
+            { year: getYear(today), bookCount: bookInThisYear.length },
+            { year: getYear(todayLastYear), bookCount: bookInLastYear.length },
+            {
+              year: getYear(todayLastTwoYear),
+              bookCount: bookInLastTwoYear.length,
+            },
+            {
+              year: getYear(todayLastThreeYear),
+              bookCount: bookInLastThreeYear.length,
+            },
+            {
+              year: getYear(todayLastFourYear),
+              bookCount: bookInLastFourYear.length,
+            },
+          ],
         },
       });
     } catch (error) {
