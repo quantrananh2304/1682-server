@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import { GET_LIST_POST_SORT, IPostService } from "./interface";
 import Posts, { PostModelInterface } from "@app-repositories/models/Posts";
 import { Types } from "mongoose";
+import { isSameDay } from "date-fns";
 
 @injectable()
 class PostService implements IPostService {
@@ -987,6 +988,38 @@ class PostService implements IPostService {
     ];
 
     const posts = await Posts.aggregate(aggregation);
+
+    return posts;
+  }
+
+  async getPostByDate(
+    startDate: Date,
+    endDate: Date
+  ): Promise<PostModelInterface[]> {
+    let matcher: any;
+
+    if (isSameDay(new Date(startDate), new Date(endDate))) {
+      matcher = { createdAt: new Date(startDate) };
+    } else {
+      matcher = {
+        $and: [
+          {
+            createdAt: {
+              $gte: new Date(startDate),
+            },
+          },
+          {
+            createdAt: {
+              $lte: new Date(endDate),
+            },
+          },
+        ],
+      };
+    }
+
+    const posts: Array<PostModelInterface> = await Posts.find(matcher).sort({
+      createdAt: 1,
+    });
 
     return posts;
   }

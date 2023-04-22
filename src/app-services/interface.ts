@@ -382,4 +382,9 @@ export interface IPostService {
   getPostDetail(postId: string): Promise<PostModelInterface>;
 
   getListPostByUserId(userId: string): Promise<Array<PostModelInterface>>;
+
+  getPostByDate(
+    startDate: Date,
+    endDate: Date
+  ): Promise<Array<PostModelInterface>>;
 }

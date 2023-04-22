@@ -6,6 +6,7 @@ import { USER_ROLE, UserModelInterface } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import BookService from "@app-services/BookService";
 import EventService from "@app-services/EventService";
+import PostService from "@app-services/PostService";
 import TopicService from "@app-services/TopicService";
 import UserService from "@app-services/UserService";
 import CONSTANTS from "@app-utils/Constants";
@@ -18,6 +19,7 @@ class BookController {
   @inject(TYPES.EventService) private readonly eventService: EventService;
   @inject(TYPES.TopicService) private readonly topicService: TopicService;
   @inject(TYPES.UserService) private readonly userService: UserService;
+  @inject(TYPES.PostService) private readonly postService: PostService;
 
   async createBook(req: Request, res: Response) {
     try {
@@ -432,26 +434,26 @@ class BookController {
   async adminDashboard(req: Request, res: Response) {
     try {
       const today: Date = new Date();
+      const yesterday: Date = sub(today, { days: 1 });
       const todayLastYear: Date = sub(today, { years: 1 });
       const firstDateOfYear: Date = startOfYear(today);
       const todayLastTwoYear: Date = sub(today, { years: 2 });
       const todayLastThreeYear: Date = sub(today, { years: 3 });
       const todayLastFourYear: Date = sub(today, { years: 4 });
 
-      const bookInRecentYear: Array<BookModelInterface> =
-        await this.bookService.getBookByDate(todayLastYear, today);
-
-      if (!bookInRecentYear) {
-        return res.internal({});
-      }
-
       const [
+        bookInRecentYear,
         bookInThisYear,
         bookInLastYear,
         bookInLastTwoYear,
         bookInLastThreeYear,
         bookInLastFourYear,
+        postToday,
+        postYesterday,
+        postInThisYear,
+        postInLastYear,
       ] = await Promise.all([
+        this.bookService.getBookByDate(todayLastYear, today),
         this.bookService.getBookByDate(firstDateOfYear, today),
         this.bookService.getBookByDate(
           startOfYear(todayLastYear),
@@ -469,14 +471,45 @@ class BookController {
           startOfYear(todayLastFourYear),
           endOfYear(todayLastFourYear)
         ),
+        this.postService.getPostByDate(today, today),
+        this.postService.getPostByDate(yesterday, today),
+        this.postService.getPostByDate(firstDateOfYear, today),
+        this.postService.getPostByDate(
+          startOfYear(todayLastYear),
+          endOfYear(todayLastYear)
+        ),
       ]);
 
+      const [postInLastTwoYear, postInLastThreeYear, postInLastFourYear] =
+        await Promise.all([
+          this.postService.getPostByDate(
+            startOfYear(todayLastTwoYear),
+            endOfYear(todayLastTwoYear)
+          ),
+          this.postService.getPostByDate(
+            startOfYear(todayLastThreeYear),
+            endOfYear(todayLastThreeYear)
+          ),
+          this.postService.getPostByDate(
+            startOfYear(todayLastFourYear),
+            endOfYear(todayLastFourYear)
+          ),
+        ]);
+
       if (
+        !bookInRecentYear ||
         !bookInThisYear ||
         !bookInLastYear ||
         !bookInLastTwoYear ||
         !bookInLastThreeYear ||
-        !bookInLastFourYear
+        !bookInLastFourYear ||
+        !postToday ||
+        !postYesterday ||
+        !postInThisYear ||
+        !postInLastYear ||
+        !postInLastTwoYear ||
+        !postInLastThreeYear ||
+        !postInLastFourYear
       ) {
         return res.internal({});
       }
@@ -525,21 +558,107 @@ class BookController {
           }, {}),
 
           totalBookEachYear: [
-            { year: getYear(today), bookCount: bookInThisYear.length },
-            { year: getYear(todayLastYear), bookCount: bookInLastYear.length },
+            {
+              year: getYear(today),
+              bookCount: bookInThisYear.length,
+              postCount: postInThisYear.length,
+            },
+            {
+              year: getYear(todayLastYear),
+              bookCount: bookInLastYear.length,
+              postCount: postInLastYear.length,
+            },
             {
               year: getYear(todayLastTwoYear),
               bookCount: bookInLastTwoYear.length,
+              postCount: postInLastTwoYear.length,
             },
             {
               year: getYear(todayLastThreeYear),
               bookCount: bookInLastThreeYear.length,
+              postCount: postInLastThreeYear.length,
             },
             {
               year: getYear(todayLastFourYear),
               bookCount: bookInLastFourYear.length,
+              postCount: postInLastFourYear.length,
             },
           ],
+
+          todayPostCount: postToday.length,
+
+          yesterdayPostCount: postYesterday.length,
+
+          thisYearPostCount: postInThisYear.length,
+
+          lastYearPostCount: postInLastYear.length,
+
+          interactionCount: bookInRecentYear
+            .reduce((prev, cur) => {
+              const { topics, like, dislike, views, comments } = cur;
+
+              const likeCount = like.length;
+              const dislikeCount = dislike.length;
+              const viewsCount = views.length;
+              const commentsCount = comments.length;
+
+              topics.forEach((item: any) => {
+                const { _id, name } = item;
+
+                if (
+                  !prev
+                    .map((prevTopic: any) => String(prevTopic._id))
+                    .includes(String(_id))
+                ) {
+                  prev.push({
+                    _id,
+                    name,
+                    likeCount,
+                    dislikeCount,
+                    viewsCount,
+                    commentsCount,
+                  });
+                } else {
+                  const index = prev
+                    .map((prevTopic: any) => String(prevTopic._id))
+                    .indexOf(String(_id));
+
+                  prev[index].likeCount += likeCount;
+                  prev[index].dislikeCount += dislikeCount;
+                  prev[index].viewsCount += viewsCount;
+                  prev[index].commentsCount += commentsCount;
+                }
+              });
+
+              return prev;
+            }, [])
+            .reduce((prev, cur) => {
+              const {
+                _id,
+                name,
+                likeCount,
+                dislikeCount,
+                viewsCount,
+                commentsCount,
+              } = cur;
+
+              prev.push({ _id, name, type: "likeCount", value: likeCount });
+              prev.push({
+                _id,
+                name,
+                type: "dislikeCount",
+                value: dislikeCount,
+              });
+              prev.push({ _id, name, type: "viewsCount", value: viewsCount });
+              prev.push({
+                _id,
+                name,
+                type: "commentsCount",
+                value: commentsCount,
+              });
+
+              return prev;
+            }, []),
         },
       });
     } catch (error) {
