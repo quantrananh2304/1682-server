@@ -26,7 +26,7 @@ export interface UserModelInterface extends BaseModelInterface {
   firstName: string;
   lastName: string;
   email: string;
-  avatar: string;
+  avatar: { name: string; url: string; contentType: string };
   password: string;
   status: USER_STATUS;
   role: USER_ROLE;
@@ -74,8 +74,12 @@ const userSchema = new Schema({
   },
 
   avatar: {
-    type: String,
-    default: "",
+    type: {
+      name: String,
+      url: String,
+      contentType: String,
+    },
+    default: {},
   },
 
   password: {

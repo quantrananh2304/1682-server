@@ -178,6 +178,15 @@ router.get(
   UserControllerInstance.getMessageById.bind(UserControllerInstance)
 );
 
+router.put(
+  "/user/upload-avatar",
+  UserMiddleware.uploadAvatar,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.uploadAvatar.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

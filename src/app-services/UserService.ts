@@ -641,7 +641,6 @@ class UserService implements IUserService {
     _user: {
       firstName: string;
       lastName: string;
-      avatar: string;
       address: string;
       dob: string;
       gender: USER_GENDER | string;
@@ -841,6 +840,25 @@ class UserService implements IUserService {
       path: "messages.receiver",
       select: "_id firstName lastName",
     });
+
+    return user;
+  }
+
+  async uploadAvatar(
+    userId: string,
+    avatar: { url: string; name: string; contentType: string }
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          avatar,
+          updatedBy: Types.ObjectId(userId),
+          updatedAt: new Date(),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
 
     return user;
   }

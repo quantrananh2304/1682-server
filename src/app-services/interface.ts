@@ -156,7 +156,6 @@ export interface IUserService {
     _user: {
       firstName: string;
       lastName: string;
-      avatar: string;
       address: string;
       dob: string;
       gender: USER_GENDER | string;
@@ -178,6 +177,11 @@ export interface IUserService {
   ): Promise<UserModelInterface>;
 
   getAllMessageById(userId: string): Promise<UserModelInterface>;
+
+  uploadAvatar(
+    userId: string,
+    avatar: { url: string; name: string; contentType: string }
+  ): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

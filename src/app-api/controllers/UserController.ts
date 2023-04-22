@@ -418,7 +418,7 @@ class UserController {
   async editProfile(req: Request, res: Response) {
     try {
       const { userId } = req.headers;
-      const { firstName, lastName, avatar, address, dob, gender } = req.body;
+      const { firstName, lastName, address, dob, gender } = req.body;
 
       const user: UserModelInterface = await this.userService.getUserById(
         userId
@@ -432,7 +432,6 @@ class UserController {
         await this.userService.editProfile(userId, {
           firstName,
           lastName,
-          avatar,
           address,
           dob,
           gender,
@@ -630,7 +629,7 @@ class UserController {
 
   async getListPost(req: Request, res: Response) {
     try {
-      const { userId } = req.headers;
+      const { userId } = req.query;
 
       const posts: Array<PostModelInterface> =
         await this.postService.getListPostByUserId(userId);
@@ -786,6 +785,35 @@ class UserController {
       });
 
       return res.successRes({ data: user.messages });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async uploadAvatar(req: Request, res: Response) {
+    try {
+      const { userId } = req.headers;
+      const { contentType, url, name } = req.body;
+
+      const user: UserModelInterface = await this.userService.uploadAvatar(
+        userId,
+        { contentType, url, name }
+      );
+
+      if (!user) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: userId,
+        actor: userId,
+        description: "/user/upload-avatar",
+      });
+
+      return res.successRes({ data: {} });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.message });

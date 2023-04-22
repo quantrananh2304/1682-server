@@ -284,6 +284,27 @@ const UserMiddleware = {
       .custom((userId: string) => isValidObjectId(userId))
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
   ],
+
+  uploadAvatar: [
+    body("name").exists({ checkFalsy: true, checkNull: true }).isString(),
+
+    body("url")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .isURL(),
+
+    body("contentType")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString(),
+  ],
+
+  getListPost: [
+    query("userId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((userId: string) => isValidObjectId(userId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
 };
 
 export default UserMiddleware;
