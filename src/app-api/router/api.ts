@@ -170,6 +170,14 @@ router.get(
   UserControllerInstance.getMessages.bind(UserControllerInstance)
 );
 
+router.get(
+  "/user/all-messages",
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.getMessageById.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

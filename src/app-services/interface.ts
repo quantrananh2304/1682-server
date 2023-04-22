@@ -176,6 +176,8 @@ export interface IUserService {
     toId: string,
     content: string
   ): Promise<UserModelInterface>;
+
+  getAllMessageById(userId: string): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

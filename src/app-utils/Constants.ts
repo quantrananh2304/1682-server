@@ -188,10 +188,6 @@ const CONSTANTS = {
 
     ACTION_INVALID: "Action invalid",
   },
-
-  IO_EVENT: {
-    SEND_MESSAGE: "SEND_MESSAGE",
-  },
 };
 
 export default CONSTANTS;

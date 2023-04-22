@@ -704,30 +704,11 @@ class UserController {
       }
 
       if (res.io) {
-        // [userId, receiver].forEach((item) => {
-        //   res.io.emit(item, {
-        //     // from: {
-        //     //   _id: userId,
-        //     //   messages: updatedUser.messages.filter(
-        //     //     (item) => String(item.receiver) === receiver
-        //     //   ),
-        //     // },
-        //     // to: {
-        //     //   _id: receiver,
-        //     //   messages: updatedReceiver.messages.filter(
-        //     //     (item) => String(item.receiver) === userId
-        //     //   ),
-        //     // },
-        //   });
-        // });
-
         res.io.emit(receiver, {
           messages: updatedReceiver.messages.filter(
             (item) => String(item.receiver) === userId
           )[0],
         });
-
-        res.io.emit(CONSTANTS.IO_EVENT.SEND_MESSAGE, { value: content });
       }
 
       await this.eventService.createEvent({
@@ -778,6 +759,33 @@ class UserController {
       });
 
       return res.successRes({ data: messages });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async getMessageById(req: Request, res: Response) {
+    try {
+      const { userId } = req.headers;
+
+      const user: UserModelInterface = await this.userService.getAllMessageById(
+        userId
+      );
+
+      if (!user) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.READ,
+        schemaId: userId,
+        actor: userId,
+        description: "/user/get-messages",
+      });
+
+      return res.successRes({ data: user.messages });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.message });

@@ -835,6 +835,15 @@ class UserService implements IUserService {
 
     return updatedUser;
   }
+
+  async getAllMessageById(userId: string): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findById(userId).populate({
+      path: "messages.receiver",
+      select: "_id firstName lastName",
+    });
+
+    return user;
+  }
 }
 
 export default UserService;
