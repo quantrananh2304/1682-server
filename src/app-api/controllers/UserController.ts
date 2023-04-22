@@ -726,6 +726,8 @@ class UserController {
             (item) => String(item.receiver) === userId
           )[0],
         });
+
+        res.io.emit(CONSTANTS.IO_EVENT.SEND_MESSAGE, { value: content });
       }
 
       await this.eventService.createEvent({
