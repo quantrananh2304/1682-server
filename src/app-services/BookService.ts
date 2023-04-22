@@ -24,7 +24,11 @@ class BookService implements IBookService {
       comments: [],
       topics,
       subscribedUsers: [],
-      hidden: false,
+      hidden: {
+        isHidden: false,
+        hiddenBy: null,
+        hiddenUntil: null,
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
       updatedBy: Types.ObjectId(actor),
