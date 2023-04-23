@@ -60,6 +60,8 @@ export enum GET_LIST_BOOK_SORT {
   TOPIC_DESC = "TOPIC_DESC",
   SUBSCRIBED_USER_ASC = "SUBSCRIBED_USER_ASC",
   SUBSCRIBED_USER_DESC = "SUBSCRIBED_USER_DESC",
+  DATE_CREATED_ASC = "DATE_CREATED_ASC",
+  DATE_CREATED_DESC = "DATE_CREATED_DESC",
 }
 
 export enum GET_LIST_REPORT_SORT {
@@ -242,6 +244,9 @@ export interface IBookService {
     limit: number;
     sort: GET_LIST_BOOK_SORT;
     keyword: string;
+    filteredBy: {
+      topics: Array<string>;
+    };
   }): Promise<{
     books: Array<BookModelInterface>;
     page: number;

@@ -48,6 +48,22 @@ const BookMiddleware = {
         return true;
       })
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.SORT_OPTION_INVALID),
+
+    query("topics").custom((topics) => {
+      if (!topics) {
+        return true;
+      }
+
+      if (Array.isArray(topics)) {
+        if (!topics.length) {
+          return true;
+        } else {
+          return topics.every((item) => isValidObjectId(item));
+        }
+      }
+
+      return false;
+    }),
   ],
 
   hide: [

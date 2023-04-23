@@ -69,13 +69,14 @@ class BookController {
 
   async getListBook(req: Request, res: Response) {
     try {
-      const { page, limit, sort, keyword } = req.query;
+      const { page, limit, sort, keyword, topics } = req.query;
 
       const book = await this.bookService.getListBook({
         page: Number(page) - 1,
         limit: Number(limit),
         sort,
         keyword: keyword || "",
+        filteredBy: { topics: topics || [] },
       });
 
       if (!book) {

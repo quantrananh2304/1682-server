@@ -52,13 +52,16 @@ class BookService implements IBookService {
     limit: number;
     sort: GET_LIST_BOOK_SORT;
     keyword: string;
+    filteredBy: {
+      topics: Array<string>;
+    };
   }): Promise<{
     books: BookModelInterface[];
     page: number;
     total: number;
     totalPage: number;
   }> {
-    const { page, limit, keyword } = filter;
+    const { page, limit, keyword, filteredBy } = filter;
 
     const skip = page * limit;
 
@@ -129,17 +132,37 @@ class BookService implements IBookService {
         sort = { viewCount: -1 };
         break;
 
+      case GET_LIST_BOOK_SORT.DATE_CREATED_ASC:
+        sort = { createdAt: 1 };
+        break;
+
+      case GET_LIST_BOOK_SORT.DATE_CREATED_DESC:
+        sort = { createdAt: -1 };
+        break;
+
       default:
         break;
     }
 
-    const aggregation = [
-      {
-        $match: {
+    const matcher: any = {
+      $and: [
+        {
           title: { $regex: keyword, $options: "i" },
           "hidden.isHidden": false,
         },
-      },
+      ],
+    };
+
+    if (filteredBy.topics && filteredBy.topics.length) {
+      matcher.$and.push({
+        topics: {
+          $in: filteredBy.topics.map((item: string) => Types.ObjectId(item)),
+        },
+      });
+    }
+
+    const aggregation = [
+      { $match: matcher },
 
       {
         $lookup: {
@@ -514,10 +537,7 @@ class BookService implements IBookService {
 
     const [books, total] = await Promise.all([
       Books.aggregate(aggregation),
-      Books.find({
-        title: { $regex: keyword, $options: "i" },
-        "hidden.isHidden": false,
-      }).countDocuments(),
+      Books.find(matcher).countDocuments(),
     ]);
 
     return {
