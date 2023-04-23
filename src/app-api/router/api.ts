@@ -187,6 +187,15 @@ router.put(
   UserControllerInstance.uploadAvatar.bind(UserControllerInstance)
 );
 
+router.get(
+  "/user/favorites",
+  UserMiddleware.getListFavorite,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.getListFavorite.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

@@ -184,6 +184,8 @@ export interface IUserService {
     userId: string,
     avatar: { url: string; name: string; contentType: string }
   ): Promise<UserModelInterface>;
+
+  getFavoriteBookList(userId: string): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

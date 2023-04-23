@@ -305,6 +305,14 @@ const UserMiddleware = {
       .custom((userId: string) => isValidObjectId(userId))
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
   ],
+
+  getListFavorite: [
+    query("userId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((userId: string) => isValidObjectId(userId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+  ],
 };
 
 export default UserMiddleware;

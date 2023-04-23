@@ -862,6 +862,26 @@ class UserService implements IUserService {
 
     return user;
   }
+
+  async getFavoriteBookList(userId: string): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findById(userId)
+      .populate({
+        path: "favorites.book",
+        select: "title like dislike views comments topics hidden",
+        populate: [
+          { path: "dislike.user", select: "firstName lastName avatar _id" },
+          { path: "like.user", select: "firstName lastName avatar _id" },
+          { path: "views.user", select: "firstName lastName avatar _id" },
+          {
+            path: "comments.createdBy",
+            select: "firstName lastName avatar _id",
+          },
+        ],
+      })
+      .lean();
+
+    return user;
+  }
 }
 
 export default UserService;

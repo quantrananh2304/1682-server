@@ -34,7 +34,7 @@ export interface UserModelInterface extends BaseModelInterface {
   dob: Date;
   phoneNumber: string;
   gender: USER_GENDER | string;
-  favorites: Array<{ book: string | Types.ObjectId; createdAt: Date }>;
+  favorites: Array<{ book: string | Types.ObjectId; createdAt: Date } | any>;
   following: Array<{ user: string | Types.ObjectId; createdAt: Date }>;
   followers: Array<{ user: string | Types.ObjectId; createdAt: Date }>;
   resetPasswordCode: string;

@@ -819,6 +819,42 @@ class UserController {
       return res.internal({ message: error.message });
     }
   }
+
+  async getListFavorite(req: Request, res: Response) {
+    try {
+      const { userId } = req.query;
+
+      const user: UserModelInterface =
+        await this.userService.getFavoriteBookList(userId);
+
+      if (!user || user.status !== USER_STATUS.ACTIVE) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.USER,
+        action: EVENT_ACTION.READ,
+        schemaId: userId,
+        actor: userId,
+        description: "/user/favorites",
+      });
+
+      return res.successRes({
+        data: user.favorites
+          .filter((item) => !item.book.hidden.isHidden)
+          .map((item) => ({
+            ...item,
+            likeCount: item.book.like.length,
+            dislikeCount: item.book.dislike.length,
+            viewsCount: item.book.views.length,
+            commentsCount: item.book.comments.length,
+          })),
+      });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
 }
 
 export default UserController;
