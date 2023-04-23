@@ -876,6 +876,10 @@ class UserService implements IUserService {
             path: "comments.createdBy",
             select: "firstName lastName avatar _id",
           },
+          {
+            path: "topics",
+            select: "name _id",
+          },
         ],
       })
       .lean();
