@@ -376,6 +376,18 @@ class PostService implements IPostService {
                           },
                         ],
                       },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$commentedBy.avatar",
+                          {
+                            $indexOfArray: [
+                              "$commentedBy._id",
+                              "$$this.createdBy",
+                            ],
+                          },
+                        ],
+                      },
                     },
                   },
                 ],
@@ -398,6 +410,7 @@ class PostService implements IPostService {
                 _id: 1,
                 firstName: 1,
                 lastName: 1,
+                avatar: 1,
               },
             },
           ],
@@ -407,6 +420,31 @@ class PostService implements IPostService {
       {
         $unwind: {
           path: "$updatedBy",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "createdBy",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                avatar: 1,
+              },
+            },
+          ],
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$createdBy",
         },
       },
 
@@ -737,6 +775,7 @@ class PostService implements IPostService {
         select: "firstName lastName _id avatar",
       })
       .populate({ path: "updatedBy", select: "firstName lastName _id avatar" })
+      .populate({ path: "createdBy", select: "firstName lastName _id avatar" })
       .lean();
 
     return post;
@@ -790,6 +829,13 @@ class PostService implements IPostService {
                           { $indexOfArray: ["$likedBy._id", "$$this.user"] },
                         ],
                       },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$likedBy.avatar",
+                          { $indexOfArray: ["$likedBy._id", "$$this.user"] },
+                        ],
+                      },
                     },
                   },
                 ],
@@ -836,6 +882,13 @@ class PostService implements IPostService {
                       lastName: {
                         $arrayElemAt: [
                           "$dislikedBy.lastName",
+                          { $indexOfArray: ["$dislikedBy._id", "$$this.user"] },
+                        ],
+                      },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$dislikedBy.avatar",
                           { $indexOfArray: ["$dislikedBy._id", "$$this.user"] },
                         ],
                       },
@@ -952,6 +1005,15 @@ class PostService implements IPostService {
                           },
                         ],
                       },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$commentedBy.avatar",
+                          {
+                            $indexOfArray: ["$commentedBy._id", "$$this.user"],
+                          },
+                        ],
+                      },
                     },
                   },
                 ],
@@ -987,6 +1049,30 @@ class PostService implements IPostService {
       },
 
       {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "createdBy",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+              },
+            },
+          ],
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$createdBy",
+        },
+      },
+
+      {
         $project: {
           _id: 1,
           like: 1,
@@ -995,6 +1081,7 @@ class PostService implements IPostService {
           comments: 1,
           hidden: 1,
           updatedBy: 1,
+          createdBt: 1,
           createdAt: 1,
           content: 1,
           images: 1,

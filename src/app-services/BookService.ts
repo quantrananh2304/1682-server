@@ -52,7 +52,8 @@ class BookService implements IBookService {
     const book: BookModelInterface = await Books.findById(_id)
       .select("-__v")
       .populate("topics")
-      .populate({ path: "updatedBy", select: "firstName lastName _id" });
+      .populate({ path: "updatedBy", select: "firstName lastName _id avatar" })
+      .populate({ path: "createdBy", select: "firstName lastName _id avatar" });
 
     return book;
   }
@@ -213,6 +214,13 @@ class BookService implements IBookService {
                           { $indexOfArray: ["$likedBy._id", "$$this.user"] },
                         ],
                       },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$likedBy.avatar",
+                          { $indexOfArray: ["$likedBy._id", "$$this.user"] },
+                        ],
+                      },
                     },
                   },
                 ],
@@ -259,6 +267,13 @@ class BookService implements IBookService {
                       lastName: {
                         $arrayElemAt: [
                           "$dislikedBy.lastName",
+                          { $indexOfArray: ["$dislikedBy._id", "$$this.user"] },
+                        ],
+                      },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$dislikedBy.avatar",
                           { $indexOfArray: ["$dislikedBy._id", "$$this.user"] },
                         ],
                       },
@@ -439,6 +454,15 @@ class BookService implements IBookService {
                           },
                         ],
                       },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$commentedBy.avatar",
+                          {
+                            $indexOfArray: ["$commentedBy._id", "$$this.user"],
+                          },
+                        ],
+                      },
                     },
                   },
                 ],
@@ -474,6 +498,30 @@ class BookService implements IBookService {
       },
 
       {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "createdBy",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+              },
+            },
+          ],
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$createdBy",
+        },
+      },
+
+      {
         $project: {
           _id: 1,
           title: 1,
@@ -486,6 +534,7 @@ class BookService implements IBookService {
           subscribedUser: 1,
           hidden: 1,
           updatedBy: 1,
+          createdBy: 1,
           createdAt: 1,
 
           chapterCount: {
@@ -825,6 +874,7 @@ class BookService implements IBookService {
         select: "firstName lastName _id avatar",
       })
       .populate({ path: "updatedBy", select: "firstName lastName _id avatar" })
+      .populate({ path: "createdBy", select: "firstName lastName _id avatar" })
       .populate({ path: "topics", select: "name note _id" })
       .lean();
 
