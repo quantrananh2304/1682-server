@@ -205,6 +205,16 @@ router.get(
   UserControllerInstance.getListFavorite.bind(UserControllerInstance)
 );
 
+router.put(
+  "/admin/user/:userId/toggle-user-status",
+  UserMiddleware.toggleUserStatus,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAdmin,
+  UserControllerInstance.toggleUserStatus.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",

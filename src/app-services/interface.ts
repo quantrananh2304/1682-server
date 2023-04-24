@@ -195,6 +195,10 @@ export interface IUserService {
   ): Promise<UserModelInterface>;
 
   getFavoriteBookList(userId: string): Promise<UserModelInterface>;
+
+  lockUser(userId: string, actor: string): Promise<UserModelInterface>;
+
+  unlockUser(userId: string, actor: string): Promise<UserModelInterface>;
 }
 
 export interface IEventService {

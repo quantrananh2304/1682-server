@@ -313,6 +313,20 @@ const UserMiddleware = {
       .custom((userId: string) => isValidObjectId(userId))
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
   ],
+
+  toggleUserStatus: [
+    param("userId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((userId: string) => isValidObjectId(userId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("action")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((action) => action === "lock" || action === "unlock")
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.ACTION_INVALID),
+  ],
 };
 
 export default UserMiddleware;

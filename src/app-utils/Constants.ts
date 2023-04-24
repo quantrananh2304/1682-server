@@ -187,6 +187,16 @@ const CONSTANTS = {
       message: "Cannot follow yourself",
     },
 
+    USER_ALR_LOCKED: {
+      errorCode: "033",
+      message: "User already locked",
+    },
+
+    USER_ALR_UNLOCKED: {
+      errorCode: "034",
+      message: "User already unlocked",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

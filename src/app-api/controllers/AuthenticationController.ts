@@ -40,6 +40,10 @@ class AuthenticationController {
         return res.errorRes(CONSTANTS.SERVER_ERROR.ACCOUNT_LOCKED);
       }
 
+      if (user.status === USER_STATUS.INACTIVE) {
+        await this.userService.unlockUser(String(user._id), String(user._id));
+      }
+
       const isMatch: boolean = await bcrypt.compare(password, user.password);
 
       if (!isMatch) {

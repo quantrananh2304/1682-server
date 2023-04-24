@@ -886,6 +886,38 @@ class UserService implements IUserService {
 
     return user;
   }
+
+  async lockUser(userId: string, actor: string): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          status: USER_STATUS.LOCKED,
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return user;
+  }
+
+  async unlockUser(userId: string, actor: string): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          status: USER_STATUS.ACTIVE,
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return user;
+  }
 }
 
 export default UserService;

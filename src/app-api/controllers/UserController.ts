@@ -871,6 +871,71 @@ class UserController {
       return res.internal({ message: error.message });
     }
   }
+
+  async toggleUserStatus(req: Request, res: Response) {
+    try {
+      const { userId } = req.params;
+      const actor = req.headers.userId;
+      const { action } = req.body;
+
+      if (userId === actor) {
+        return res.internal({});
+      }
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      if (action === "lock") {
+        if (user.status === USER_STATUS.LOCKED) {
+          return res.errorRes(CONSTANTS.SERVER_ERROR.USER_ALR_LOCKED);
+        }
+
+        const updatedUser: UserModelInterface = await this.userService.lockUser(
+          userId,
+          actor
+        );
+
+        if (!updatedUser) {
+          return res.internal({});
+        }
+
+        await this.eventService.createEvent({
+          schema: EVENT_SCHEMA.USER,
+          action: EVENT_ACTION.UPDATE,
+          schemaId: userId,
+          actor,
+          description: "/user/lock",
+        });
+
+        return res.successRes({ data: {} });
+      } else {
+        if (user.status !== USER_STATUS.LOCKED) {
+          return res.errorRes(CONSTANTS.SERVER_ERROR.USER_ALR_UNLOCKED);
+        }
+
+        const updatedUser: UserModelInterface =
+          await this.userService.unlockUser(userId, actor);
+
+        if (!updatedUser) {
+          return res.internal({});
+        }
+
+        await this.eventService.createEvent({
+          schema: EVENT_SCHEMA.USER,
+          action: EVENT_ACTION.UPDATE,
+          schemaId: userId,
+          actor,
+          description: "/user/unlock",
+        });
+
+        return res.successRes({ data: {} });
+      }
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
 }
 
 export default UserController;
