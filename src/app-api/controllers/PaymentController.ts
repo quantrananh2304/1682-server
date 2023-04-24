@@ -128,7 +128,10 @@ class PaymentController {
       vnp_Params["vnp_Locale"] = locale;
       vnp_Params["vnp_CurrCode"] = currCode;
       vnp_Params["vnp_TxnRef"] = orderId;
-      vnp_Params["vnp_OrderInfo"] = "Payment for order:" + orderId;
+      // vnp_Params["vnp_OrderInfo"] = "Payment for order:" + orderId;
+      vnp_Params[
+        "vnp_OrderInfo"
+      ] = `User ${userId} paid for order ${payment._id}`;
       vnp_Params["vnp_OrderType"] = "other";
       vnp_Params["vnp_Amount"] = amount * 100;
       vnp_Params["vnp_ReturnUrl"] = returnUrl;
