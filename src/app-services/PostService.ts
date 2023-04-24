@@ -1010,7 +1010,10 @@ class PostService implements IPostService {
                         $arrayElemAt: [
                           "$commentedBy.avatar",
                           {
-                            $indexOfArray: ["$commentedBy._id", "$$this.user"],
+                            $indexOfArray: [
+                              "$commentedBy._id",
+                              "$$this.createdBy",
+                            ],
                           },
                         ],
                       },

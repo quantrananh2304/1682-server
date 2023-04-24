@@ -459,7 +459,10 @@ class BookService implements IBookService {
                         $arrayElemAt: [
                           "$commentedBy.avatar",
                           {
-                            $indexOfArray: ["$commentedBy._id", "$$this.user"],
+                            $indexOfArray: [
+                              "$commentedBy._id",
+                              "$$this.createdBy",
+                            ],
                           },
                         ],
                       },
