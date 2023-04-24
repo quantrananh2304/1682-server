@@ -182,6 +182,11 @@ const CONSTANTS = {
       message: "Cannot read others' notifications",
     },
 
+    CANNOT_FOLLOW_YOURSELF: {
+      errorCode: "032",
+      message: "Cannot follow yourself",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

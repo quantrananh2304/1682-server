@@ -10,6 +10,7 @@ export enum NOTIFICATION_TYPE {
   DISLIKE = "DISLIKE",
   COMMENT = "COMMENT",
   VIEW = "VIEW",
+  FOLLOW = "FOLLOW",
 }
 
 export interface NotificationModelInterface extends BaseModelInterface {

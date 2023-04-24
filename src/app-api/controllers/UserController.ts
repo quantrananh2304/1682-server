@@ -18,6 +18,8 @@ import NodeMailer from "@app-repositories/smtp";
 import { BookModelInterface } from "@app-repositories/models/Books";
 import { PostModelInterface } from "@app-repositories/models/Posts";
 import PostService from "@app-services/PostService";
+import NotificationService from "@app-services/NotificationService";
+import { NOTIFICATION_TYPE } from "@app-repositories/models/Notifications";
 
 @injectable()
 class UserController {
@@ -26,6 +28,8 @@ class UserController {
   @inject(TYPES.NodeMailer) private readonly nodeMailer: NodeMailer;
   @inject(TYPES.BookService) private readonly bookService: BookService;
   @inject(TYPES.PostService) private readonly postService: PostService;
+  @inject(TYPES.NotificationService)
+  private readonly notificationService: NotificationService;
 
   async register(req: Request, res: Response) {
     try {
@@ -469,6 +473,10 @@ class UserController {
 
   async followUser(req: Request, res: Response) {
     try {
+      if (req.params.userId === req.headers.userId) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.CANNOT_FOLLOW_YOURSELF);
+      }
+
       const user: UserModelInterface = await this.userService.getUserById(
         req.params.userId
       );
@@ -497,6 +505,14 @@ class UserController {
         req.params.userId,
         req.headers.userId
       );
+
+      await this.notificationService.createNotification(req.headers.userId, {
+        content: `${actor.firstName} ${actor.lastName} followed you`,
+        schema: EVENT_SCHEMA.USER,
+        schemaId: req.headers.userId,
+        receiver: req.params.userId,
+        notiType: NOTIFICATION_TYPE.FOLLOW,
+      });
 
       if (!updatedUser) {
         return res.internal({});
