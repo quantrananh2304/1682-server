@@ -177,6 +177,11 @@ const CONSTANTS = {
       message: "Order not exist",
     },
 
+    CANNOT_READ_OTHER_NOTIFICATION: {
+      errorCode: "031",
+      message: "Cannot read others' notifications",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",

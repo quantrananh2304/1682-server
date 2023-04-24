@@ -4,6 +4,10 @@ import {
   EVENT_SCHEMA,
   EventModelInterface,
 } from "@app-repositories/models/Events";
+import {
+  NOTIFICATION_TYPE,
+  NotificationModelInterface,
+} from "@app-repositories/models/Notifications";
 import { PaymentMethodModelInterface } from "@app-repositories/models/PaymentMethods";
 import {
   PAYMENT_STATUS,
@@ -429,4 +433,32 @@ export interface IPaymentService {
     status: PAYMENT_STATUS,
     userId: string
   ): Promise<PaymentModelInterface>;
+}
+
+export interface INotificationService {
+  createNotification(
+    userId: string,
+    _notification: {
+      content: string;
+      schema: EVENT_SCHEMA;
+      schemaId: string;
+      receiver: string;
+      notiType: NOTIFICATION_TYPE;
+    }
+  ): Promise<NotificationModelInterface>;
+
+  getSelfNotificationList(
+    userId: string
+  ): Promise<Array<NotificationModelInterface>>;
+
+  markAsRead(
+    notificationId: string,
+    actor: string
+  ): Promise<NotificationModelInterface>;
+
+  getNotificationById(
+    notificationId: string
+  ): Promise<NotificationModelInterface>;
+
+  markAllAsRead(userId: string): Promise<Array<NotificationModelInterface>>;
 }

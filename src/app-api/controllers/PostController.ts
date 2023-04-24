@@ -1,9 +1,11 @@
 import { Request, Response } from "@app-helpers/http.extends";
 import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
+import { NOTIFICATION_TYPE } from "@app-repositories/models/Notifications";
 import { PostModelInterface } from "@app-repositories/models/Posts";
 import { USER_ROLE, UserModelInterface } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import EventService from "@app-services/EventService";
+import NotificationService from "@app-services/NotificationService";
 import PostService from "@app-services/PostService";
 import UserService from "@app-services/UserService";
 import CONSTANTS from "@app-utils/Constants";
@@ -14,6 +16,8 @@ class PostController {
   @inject(TYPES.PostService) private readonly postService: PostService;
   @inject(TYPES.EventService) private readonly eventService: EventService;
   @inject(TYPES.UserService) private readonly userService: UserService;
+  @inject(TYPES.NotificationService)
+  private readonly notificationService: NotificationService;
 
   async createPost(req: Request, res: Response) {
     try {
@@ -162,6 +166,31 @@ class PostController {
       if (!updatedPost) {
         return res.internal({});
       }
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      await this.notificationService.createNotification(userId, {
+        content: `${user.firstName} ${
+          user.lastName
+        } added a comment on your post: "${
+          updatedPost.content && updatedPost.content.length > 3
+            ? updatedPost.content.split(" ")[0] +
+              " " +
+              updatedPost.content.split(" ")[1] +
+              " " +
+              updatedPost.content.split(" ")[2] +
+              "..."
+            : updatedPost.content.length <= 3
+            ? updatedPost.content
+            : ""
+        }"`,
+        schema: EVENT_SCHEMA.POST,
+        schemaId: String(updatedPost._id),
+        receiver: String(updatedPost.createdBy),
+        notiType: NOTIFICATION_TYPE.COMMENT,
+      });
 
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.POST,
@@ -364,6 +393,29 @@ class PostController {
       if (!updatedPost) {
         return res.internal({});
       }
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      await this.notificationService.createNotification(userId, {
+        content: `${user.firstName} ${user.lastName} disliked your post: "${
+          updatedPost.content && updatedPost.content.length > 3
+            ? updatedPost.content.split(" ")[0] +
+              " " +
+              updatedPost.content.split(" ")[1] +
+              " " +
+              updatedPost.content.split(" ")[2] +
+              "..."
+            : updatedPost.content.length <= 3
+            ? updatedPost.content
+            : ""
+        }"`,
+        schema: EVENT_SCHEMA.POST,
+        schemaId: String(updatedPost._id),
+        receiver: String(updatedPost.createdBy),
+        notiType: NOTIFICATION_TYPE.VIEW,
+      });
 
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.POST,

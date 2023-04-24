@@ -1,5 +1,6 @@
 import AuthenticationController from "@app-api/controllers/AuthenticationController";
 import BookController from "@app-api/controllers/BookController";
+import NotificationController from "@app-api/controllers/NotificationController";
 import PaymentController from "@app-api/controllers/PaymentController";
 import PostController from "@app-api/controllers/PostController";
 import ReportController from "@app-api/controllers/ReportController";
@@ -7,6 +8,7 @@ import TopicController from "@app-api/controllers/TopicController";
 import UserController from "@app-api/controllers/UserController";
 import AuthenticationMiddleware from "@app-api/middlewares/AuthenticationMiddleware";
 import BookMiddleware from "@app-api/middlewares/BookMiddleware";
+import NotificationMiddleware from "@app-api/middlewares/NotificationMiddleware";
 import ParamsValidations from "@app-api/middlewares/ParamsValidation";
 import PaymentMiddleware from "@app-api/middlewares/PaymentMiddleware";
 import PostMiddleware from "@app-api/middlewares/PostMiddleware";
@@ -29,6 +31,9 @@ const ReportControllerInstance =
 const PostControllerInstance = container.get<PostController>(PostController);
 const PaymentControllerInstance =
   container.get<PaymentController>(PaymentController);
+const NotificationControllerInstance = container.get<NotificationController>(
+  NotificationController
+);
 
 router.get("/test", (req, res) => res.send({ status: "OK" }));
 
@@ -471,6 +476,37 @@ router.put(
   ParamsValidations.preventUnknownData,
   TokenValidation.checkToken,
   PaymentControllerInstance.updateOrderStatus.bind(PaymentControllerInstance)
+);
+
+// notification
+
+router.get(
+  "/notification/list",
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  NotificationControllerInstance.getSelfNotificationList.bind(
+    NotificationControllerInstance
+  )
+);
+
+router.put(
+  "/notification/:notificationId/mark-as-read",
+  NotificationMiddleware.markAsRead,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  NotificationControllerInstance.markAsRead.bind(NotificationControllerInstance)
+);
+
+router.put(
+  "/notification/mark-all-as-read",
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  NotificationControllerInstance.markAllAsRead.bind(
+    NotificationControllerInstance
+  )
 );
 
 export default router;

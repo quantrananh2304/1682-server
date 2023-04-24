@@ -7,6 +7,7 @@ const TYPES = {
   ReportService: Symbol.for("ReportService"),
   PostService: Symbol.for("PostService"),
   PaymentService: Symbol.for("PaymentService"),
+  NotificationService: Symbol.for("NotificationService"),
 };
 
 export default TYPES;

@@ -1,11 +1,21 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { GET_LIST_POST_SORT, IPostService } from "./interface";
 import Posts, { PostModelInterface } from "@app-repositories/models/Posts";
 import { Types } from "mongoose";
 import { isSameDay } from "date-fns";
+import TYPES from "@app-repositories/types";
+import UserService from "./UserService";
+import NotificationService from "./NotificationService";
+import { EVENT_SCHEMA } from "@app-repositories/models/Events";
+import { NOTIFICATION_TYPE } from "@app-repositories/models/Notifications";
+import { UserModelInterface } from "@app-repositories/models/Users";
 
 @injectable()
 class PostService implements IPostService {
+  @inject(TYPES.UserService) private readonly userService: UserService;
+  @inject(TYPES.NotificationService)
+  private readonly notificationService: NotificationService;
+
   async createPost(
     _post: {
       content: string;
@@ -577,6 +587,8 @@ class PostService implements IPostService {
 
     let update = {};
 
+    const user: UserModelInterface = await this.userService.getUserById(actor);
+
     if (action === "like") {
       if (like.map((item) => String(item.user)).includes(actor)) {
         update = {
@@ -601,6 +613,25 @@ class PostService implements IPostService {
             },
           },
         };
+
+        await this.notificationService.createNotification(actor, {
+          content: `${user.firstName} ${user.lastName} liked your post: "${
+            post.content && post.content.length > 3
+              ? post.content.split(" ")[0] +
+                " " +
+                post.content.split(" ")[1] +
+                " " +
+                post.content.split(" ")[2] +
+                "..."
+              : post.content.length <= 3
+              ? post.content
+              : ""
+          }"`,
+          schema: EVENT_SCHEMA.POST,
+          schemaId: String(post._id),
+          receiver: String(post.createdBy),
+          notiType: NOTIFICATION_TYPE.LIKE,
+        });
       }
     } else {
       if (dislike.map((item) => String(item.user)).includes(actor)) {
@@ -626,6 +657,25 @@ class PostService implements IPostService {
             },
           },
         };
+
+        await this.notificationService.createNotification(actor, {
+          content: `${user.firstName} ${user.lastName} disliked your post: "${
+            post.content && post.content.length > 3
+              ? post.content.split(" ")[0] +
+                " " +
+                post.content.split(" ")[1] +
+                " " +
+                post.content.split(" ")[2] +
+                "..."
+              : post.content.length <= 3
+              ? post.content
+              : ""
+          }"`,
+          schema: EVENT_SCHEMA.POST,
+          schemaId: String(post._id),
+          receiver: String(post.createdBy),
+          notiType: NOTIFICATION_TYPE.DISLIKE,
+        });
       }
     }
 

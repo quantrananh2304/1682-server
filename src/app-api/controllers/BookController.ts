@@ -1,11 +1,13 @@
 import { Request, Response } from "@app-helpers/http.extends";
 import { BookModelInterface } from "@app-repositories/models/Books";
 import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
+import { NOTIFICATION_TYPE } from "@app-repositories/models/Notifications";
 import { TopicModelInterface } from "@app-repositories/models/Topics";
 import { USER_ROLE, UserModelInterface } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import BookService from "@app-services/BookService";
 import EventService from "@app-services/EventService";
+import NotificationService from "@app-services/NotificationService";
 import PostService from "@app-services/PostService";
 import TopicService from "@app-services/TopicService";
 import UserService from "@app-services/UserService";
@@ -20,6 +22,8 @@ class BookController {
   @inject(TYPES.TopicService) private readonly topicService: TopicService;
   @inject(TYPES.UserService) private readonly userService: UserService;
   @inject(TYPES.PostService) private readonly postService: PostService;
+  @inject(TYPES.NotificationService)
+  private readonly notificationService: NotificationService;
 
   async createBook(req: Request, res: Response) {
     try {
@@ -163,6 +167,18 @@ class BookController {
       if (!updatedBook) {
         return res.internal({});
       }
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      await this.notificationService.createNotification(userId, {
+        content: `${user.firstName} ${user.lastName} added a comment on your book ${updatedBook.title}`,
+        schema: EVENT_SCHEMA.BOOK,
+        schemaId: String(updatedBook._id),
+        receiver: String(updatedBook.createdBy),
+        notiType: NOTIFICATION_TYPE.COMMENT,
+      });
 
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.BOOK,
@@ -368,6 +384,18 @@ class BookController {
       if (!updatedBook) {
         return res.internal({});
       }
+
+      const user: UserModelInterface = await this.userService.getUserById(
+        userId
+      );
+
+      await this.notificationService.createNotification(userId, {
+        content: `${user.firstName} ${user.lastName} viewed your book ${book.title}`,
+        schema: EVENT_SCHEMA.BOOK,
+        schemaId: String(updatedBook._id),
+        receiver: String(updatedBook.createdBy),
+        notiType: NOTIFICATION_TYPE.VIEW,
+      });
 
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.BOOK,

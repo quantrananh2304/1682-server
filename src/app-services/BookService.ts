@@ -1,11 +1,21 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { GET_LIST_BOOK_SORT, IBookService } from "./interface";
 import Books, { BookModelInterface } from "@app-repositories/models/Books";
 import { Types } from "mongoose";
 import { isSameDay } from "date-fns";
+import TYPES from "@app-repositories/types";
+import NotificationService from "./NotificationService";
+import { EVENT_SCHEMA } from "@app-repositories/models/Events";
+import { NOTIFICATION_TYPE } from "@app-repositories/models/Notifications";
+import UserService from "./UserService";
+import { UserModelInterface } from "@app-repositories/models/Users";
 
 @injectable()
 class BookService implements IBookService {
+  @inject(TYPES.NotificationService)
+  private readonly notificationService: NotificationService;
+  @inject(TYPES.UserService) private readonly userService: UserService;
+
   async createBook(
     _book: {
       title: string;
@@ -672,6 +682,8 @@ class BookService implements IBookService {
     action: "like" | "dislike",
     actor: string
   ): Promise<BookModelInterface> {
+    const user: UserModelInterface = await this.userService.getUserById(actor);
+
     const book: BookModelInterface = await this.getBookById(bookId);
 
     const { like, dislike } = book;
@@ -702,6 +714,14 @@ class BookService implements IBookService {
             },
           },
         };
+
+        await this.notificationService.createNotification(actor, {
+          content: `${user.firstName} ${user.lastName} liked your book ${book.title}`,
+          schema: EVENT_SCHEMA.BOOK,
+          schemaId: String(book._id),
+          receiver: String(book.createdBy),
+          notiType: NOTIFICATION_TYPE.LIKE,
+        });
       }
     } else {
       if (dislike.map((item) => String(item.user)).includes(actor)) {
@@ -727,6 +747,14 @@ class BookService implements IBookService {
             },
           },
         };
+
+        await this.notificationService.createNotification(actor, {
+          content: `${user.firstName} ${user.lastName} disliked your book ${book.title}`,
+          schema: EVENT_SCHEMA.BOOK,
+          schemaId: String(book._id),
+          receiver: String(book.createdBy),
+          notiType: NOTIFICATION_TYPE.DISLIKE,
+        });
       }
     }
 
