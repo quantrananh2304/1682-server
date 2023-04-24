@@ -9,3 +9,20 @@ export function stringGenerator(length: number): string {
 
   return result;
 }
+
+export function sortObject(obj: any) {
+  const sorted = {};
+  const str = [];
+  let key: any;
+  for (key in obj) {
+    // eslint-disable-next-line
+    if (obj.hasOwnProperty(key)) {
+      str.push(encodeURIComponent(key));
+    }
+  }
+  str.sort();
+  for (key = 0; key < str.length; key++) {
+    sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+  }
+  return sorted;
+}

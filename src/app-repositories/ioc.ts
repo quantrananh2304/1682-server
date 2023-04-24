@@ -13,6 +13,8 @@ import ReportService from "@app-services/ReportService";
 import ReportController from "@app-api/controllers/ReportController";
 import PostService from "@app-services/PostService";
 import PostController from "@app-api/controllers/PostController";
+import PaymentController from "@app-api/controllers/PaymentController";
+import PaymentService from "@app-services/PaymentService";
 
 const container = new Container();
 
@@ -22,6 +24,7 @@ container.bind(TopicController).toSelf();
 container.bind(BookController).toSelf();
 container.bind(ReportController).toSelf();
 container.bind(PostController).toSelf();
+container.bind(PaymentController).toSelf();
 
 container.bind<UserService>(TYPES.UserService).to(UserService);
 container.bind<EventService>(TYPES.EventService).to(EventService);
@@ -30,5 +33,6 @@ container.bind<TopicService>(TYPES.TopicService).to(TopicService);
 container.bind<BookService>(TYPES.BookService).to(BookService);
 container.bind<ReportService>(TYPES.ReportService).to(ReportService);
 container.bind<PostService>(TYPES.PostService).to(PostService);
+container.bind<PaymentService>(TYPES.PaymentService).to(PaymentService);
 
 export default container;

@@ -9,6 +9,8 @@ export enum EVENT_SCHEMA {
   BOOK = "BOOK",
   REPORT = "REPORT",
   POST = "POST",
+  PAYMENT_METHOD = "PAYMENT_METHOD",
+  PAYMENT = "PAYMENT",
 }
 
 export enum EVENT_ACTION {

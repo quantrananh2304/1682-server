@@ -1,5 +1,6 @@
 import AuthenticationController from "@app-api/controllers/AuthenticationController";
 import BookController from "@app-api/controllers/BookController";
+import PaymentController from "@app-api/controllers/PaymentController";
 import PostController from "@app-api/controllers/PostController";
 import ReportController from "@app-api/controllers/ReportController";
 import TopicController from "@app-api/controllers/TopicController";
@@ -7,6 +8,7 @@ import UserController from "@app-api/controllers/UserController";
 import AuthenticationMiddleware from "@app-api/middlewares/AuthenticationMiddleware";
 import BookMiddleware from "@app-api/middlewares/BookMiddleware";
 import ParamsValidations from "@app-api/middlewares/ParamsValidation";
+import PaymentMiddleware from "@app-api/middlewares/PaymentMiddleware";
 import PostMiddleware from "@app-api/middlewares/PostMiddleware";
 import ReportMiddleware from "@app-api/middlewares/ReportMiddleware";
 import TokenValidation from "@app-api/middlewares/Token";
@@ -25,6 +27,8 @@ const BookControllerInstance = container.get<BookController>(BookController);
 const ReportControllerInstance =
   container.get<ReportController>(ReportController);
 const PostControllerInstance = container.get<PostController>(PostController);
+const PaymentControllerInstance =
+  container.get<PaymentController>(PaymentController);
 
 router.get("/test", (req, res) => res.send({ status: "OK" }));
 
@@ -428,6 +432,36 @@ router.get(
   ParamsValidations.preventUnknownData,
   TokenValidation.checkToken,
   PostControllerInstance.getPostDetail.bind(PostControllerInstance)
+);
+
+// payment
+router.post(
+  "/admin/payment/create-method",
+  PaymentMiddleware.createPaymentMethod,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAdmin,
+  PaymentControllerInstance.createPaymentMethod.bind(PaymentControllerInstance)
+);
+
+router.get(
+  "/payment/available-payment-method",
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PaymentControllerInstance.getAvailablePaymentMethods.bind(
+    PaymentControllerInstance
+  )
+);
+
+router.post(
+  "/payment/create-order",
+  PaymentMiddleware.createOrder,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PaymentControllerInstance.createOrder.bind(PaymentControllerInstance)
 );
 
 export default router;

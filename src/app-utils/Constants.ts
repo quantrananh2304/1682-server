@@ -162,6 +162,16 @@ const CONSTANTS = {
       message: "User not in following or follower list",
     },
 
+    PAYMENT_METHOD_EXISTED: {
+      errorCode: "028",
+      message: "Payment method existed",
+    },
+
+    PAYMENT_METHOD_NOT_EXIST: {
+      errorCode: "029",
+      message: "Payment method not exist",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",
@@ -187,6 +197,8 @@ const CONSTANTS = {
     SORT_OPTION_INVALID: "Sort option invalid",
 
     ACTION_INVALID: "Action invalid",
+
+    AMOUNT_INVALID: "Amount invalid",
   },
 };
 

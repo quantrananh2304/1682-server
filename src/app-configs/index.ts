@@ -10,3 +10,8 @@ export const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD || "";
 export const GOOGLE_APP_PASSWORD = process.env.GOOGLE_APP_PASSWORD || "";
 export const RANDOM_TOKEN_SECRET =
   process.env.RANDOM_TOKEN_SECRET || "RANDOM_TOKEN_SECRET";
+export const vnp_TmnCode = process.env.VNP_TMN_CODE || "";
+export const vnp_HashSecret = process.env.VNP_HASH_SECRET || "";
+export const vnp_Url = process.env.VNP_URL || "";
+export const vnp_Api = process.env.VNP_API || "";
+export const vnp_ReturnUrl = process.env.VNP_RETURN_URL || "";

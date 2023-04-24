@@ -4,6 +4,8 @@ import {
   EVENT_SCHEMA,
   EventModelInterface,
 } from "@app-repositories/models/Events";
+import { PaymentMethodModelInterface } from "@app-repositories/models/PaymentMethods";
+import { PaymentModelInterface } from "@app-repositories/models/Payments";
 import { PostModelInterface } from "@app-repositories/models/Posts";
 import {
   REPORT_SCHEMA,
@@ -394,4 +396,28 @@ export interface IPostService {
     startDate: Date,
     endDate: Date
   ): Promise<Array<PostModelInterface>>;
+}
+
+export interface IPaymentService {
+  getPaymentMethod(): Promise<Array<PaymentMethodModelInterface>>;
+
+  createPaymentMethod(
+    userId: string,
+    name: string,
+    note: string
+  ): Promise<PaymentMethodModelInterface>;
+
+  getPaymentMethodByName(name: string): Promise<PaymentMethodModelInterface>;
+
+  getAvailablePaymentMethod(): Promise<Array<PaymentMethodModelInterface>>;
+
+  createOrder(
+    userId: string,
+    method: string,
+    amount: string
+  ): Promise<PaymentModelInterface>;
+
+  getPaymentMethodById(
+    paymentMethodId: string
+  ): Promise<PaymentMethodModelInterface>;
 }
