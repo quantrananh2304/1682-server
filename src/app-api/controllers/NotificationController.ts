@@ -53,8 +53,11 @@ class NotificationController {
         );
       }
 
+      const allNotifications: Array<NotificationModelInterface> =
+        await this.notificationService.getSelfNotificationList(userId);
+
       if (notification.read) {
-        return res.successRes({ data: {} });
+        return res.successRes({ data: allNotifications });
       }
 
       const updatedNotification: NotificationModelInterface =
@@ -72,7 +75,10 @@ class NotificationController {
         description: "/notification/mark-as-read",
       });
 
-      return res.successRes({ data: {} });
+      const allUpdatedNotifications: Array<NotificationModelInterface> =
+        await this.notificationService.getSelfNotificationList(userId);
+
+      return res.successRes({ data: allUpdatedNotifications });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });
