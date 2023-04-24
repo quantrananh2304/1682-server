@@ -5,7 +5,10 @@ import {
   EventModelInterface,
 } from "@app-repositories/models/Events";
 import { PaymentMethodModelInterface } from "@app-repositories/models/PaymentMethods";
-import { PaymentModelInterface } from "@app-repositories/models/Payments";
+import {
+  PAYMENT_STATUS,
+  PaymentModelInterface,
+} from "@app-repositories/models/Payments";
 import { PostModelInterface } from "@app-repositories/models/Posts";
 import {
   REPORT_SCHEMA,
@@ -420,4 +423,10 @@ export interface IPaymentService {
   getPaymentMethodById(
     paymentMethodId: string
   ): Promise<PaymentMethodModelInterface>;
+
+  updateOrderStatus(
+    paymentId: string,
+    status: PAYMENT_STATUS,
+    userId: string
+  ): Promise<PaymentModelInterface>;
 }

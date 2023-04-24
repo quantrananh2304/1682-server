@@ -464,4 +464,13 @@ router.post(
   PaymentControllerInstance.createOrder.bind(PaymentControllerInstance)
 );
 
+router.put(
+  "/payment/:paymentId/update-status",
+  PaymentMiddleware.updateOrderStatus,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PaymentControllerInstance.updateOrderStatus.bind(PaymentControllerInstance)
+);
+
 export default router;

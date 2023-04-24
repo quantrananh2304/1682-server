@@ -145,7 +145,35 @@ class PaymentController {
       vnp_Params["vnp_SecureHash"] = signed;
       vnpUrl += "?" + QueryString.stringify(vnp_Params, { encode: false });
 
-      return res.successRes({ data: vnpUrl });
+      return res.successRes({ data: { vnpUrl, paymentId: payment._id } });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  async updateOrderStatus(req: Request, res: Response) {
+    try {
+      const { userId } = req.headers;
+      const { paymentId } = req.params;
+      const { status } = req.body;
+
+      const payment: PaymentModelInterface =
+        await this.paymentService.updateOrderStatus(paymentId, status, userId);
+
+      if (!payment) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.PAYMENT_NOT_EXIST);
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.PAYMENT,
+        action: EVENT_ACTION.UPDATE,
+        schemaId: paymentId,
+        actor: userId,
+        description: "/payment/update-order-status",
+      });
+
+      return res.successRes({ data: {} });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });

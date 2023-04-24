@@ -172,6 +172,11 @@ const CONSTANTS = {
       message: "Payment method not exist",
     },
 
+    PAYMENT_NOT_EXIST: {
+      errorCode: "030",
+      message: "Order not exist",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",
@@ -199,6 +204,8 @@ const CONSTANTS = {
     ACTION_INVALID: "Action invalid",
 
     AMOUNT_INVALID: "Amount invalid",
+
+    PAYMENT_STATUS_INVALID: "Payment status invalid",
   },
 };
 

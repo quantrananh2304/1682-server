@@ -82,6 +82,26 @@ class PaymentService implements IPaymentService {
 
     return paymentMethod;
   }
+
+  async updateOrderStatus(
+    paymentId: string,
+    status: PAYMENT_STATUS,
+    userId: string
+  ): Promise<PaymentModelInterface> {
+    const payment: PaymentModelInterface = await Payments.findByIdAndUpdate(
+      paymentId,
+      {
+        $set: {
+          status,
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(userId),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return payment;
+  }
 }
 
 export default PaymentService;
