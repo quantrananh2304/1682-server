@@ -43,7 +43,9 @@ class NotificationService implements INotificationService {
     userId: string
   ): Promise<NotificationModelInterface[]> {
     const notifications: Array<NotificationModelInterface> =
-      await Notifications.find({ receiver: Types.ObjectId(userId) }).lean();
+      await Notifications.find({ receiver: Types.ObjectId(userId) })
+        .sort({ createdAt: 1 })
+        .lean();
 
     return notifications;
   }
