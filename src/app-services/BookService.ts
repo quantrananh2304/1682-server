@@ -1,6 +1,9 @@
 import { inject, injectable } from "inversify";
 import { GET_LIST_BOOK_SORT, IBookService } from "./interface";
-import Books, { BookModelInterface } from "@app-repositories/models/Books";
+import Books, {
+  BOOK_CURRENCY,
+  BookModelInterface,
+} from "@app-repositories/models/Books";
 import { Types } from "mongoose";
 import { isSameDay } from "date-fns";
 import TYPES from "@app-repositories/types";
@@ -21,10 +24,11 @@ class BookService implements IBookService {
       title: string;
       chapters: { name: string; content: string }[];
       topics: string[];
+      price: number;
     },
     actor: string
   ): Promise<BookModelInterface> {
-    const { title, chapters, topics } = _book;
+    const { title, chapters, topics, price } = _book;
     const book: BookModelInterface = await Books.create({
       title,
       chapters: chapters.map((item) => ({ ...item, createdAt: new Date() })),
@@ -43,6 +47,8 @@ class BookService implements IBookService {
       updatedAt: new Date(),
       updatedBy: Types.ObjectId(actor),
       createdBy: Types.ObjectId(actor),
+      price,
+      purchaser: [],
     });
 
     return book;
@@ -174,6 +180,70 @@ class BookService implements IBookService {
 
     const aggregation = [
       { $match: matcher },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "purchaser.user",
+          foreignField: "_id",
+          as: "purchasedBy",
+        },
+      },
+
+      {
+        $addFields: {
+          purchaser: {
+            $map: {
+              input: "$purchaser",
+              in: {
+                $mergeObjects: [
+                  "$$this",
+                  {
+                    user: {
+                      _id: {
+                        $arrayElemAt: [
+                          "$purchasedBy._id",
+                          {
+                            $indexOfArray: ["$purchasedBy._id", "$$this.user"],
+                          },
+                        ],
+                      },
+
+                      firstName: {
+                        $arrayElemAt: [
+                          "$purchasedBy.firstName",
+                          {
+                            $indexOfArray: ["$purchasedBy._id", "$$this.user"],
+                          },
+                        ],
+                      },
+
+                      lastName: {
+                        $arrayElemAt: [
+                          "$purchasedBy.lastName",
+                          {
+                            $indexOfArray: ["$purchasedBy._id", "$$this.user"],
+                          },
+                        ],
+                      },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$purchasedBy.avatar",
+                          {
+                            $indexOfArray: ["$purchasedBy._id", "$$this.user"],
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          likedBy: "$$REMOVE",
+        },
+      },
 
       {
         $lookup: {
@@ -541,6 +611,7 @@ class BookService implements IBookService {
           updatedBy: 1,
           createdBy: 1,
           createdAt: 1,
+          price: 1,
 
           chapterCount: {
             $cond: {
@@ -586,6 +657,14 @@ class BookService implements IBookService {
             $cond: {
               if: { $isArray: "$view" },
               then: { $size: "$view" },
+              else: 0,
+            },
+          },
+
+          purchaserCount: {
+            $cond: {
+              if: { $isArray: "$purchaser" },
+              then: { $size: "$purchaser" },
               else: 0,
             },
           },
@@ -918,6 +997,29 @@ class BookService implements IBookService {
       .lean();
 
     return books;
+  }
+
+  async addPurchaser(
+    bookId: string,
+    userId: string,
+    price: { amount: number; currency: BOOK_CURRENCY }
+  ): Promise<BookModelInterface> {
+    const book: BookModelInterface = await Books.findByIdAndUpdate(
+      bookId,
+      {
+        $push: {
+          purchaser: {
+            user: Types.ObjectId(userId),
+            createdAt: new Date(),
+            price,
+          },
+          $position: 0,
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return book;
   }
 }
 

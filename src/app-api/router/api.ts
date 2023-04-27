@@ -472,11 +472,11 @@ router.get(
 
 router.post(
   "/payment/create-order",
-  PaymentMiddleware.createOrder,
+  PaymentMiddleware.createOrderForBook,
   ParamsValidations.validationRequest,
   ParamsValidations.preventUnknownData,
   TokenValidation.checkToken,
-  PaymentControllerInstance.createOrder.bind(PaymentControllerInstance)
+  PaymentControllerInstance.createOrderForBook.bind(PaymentControllerInstance)
 );
 
 router.put(

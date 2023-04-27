@@ -16,17 +16,17 @@ const PaymentMiddleware = {
       .isLength({ min: 0, max: 255 }),
   ],
 
-  createOrder: [
-    body("amount")
-      .exists({ checkFalsy: true, checkNull: true })
-      .isString()
-      .custom((amount) => Number(amount))
-      .withMessage(CONSTANTS.VALIDATION_MESSAGE.AMOUNT_INVALID),
-
+  createOrderForBook: [
     body("method")
       .exists({ checkFalsy: true, checkNull: true })
       .isString()
       .custom((method) => isValidObjectId(method))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("bookId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((bookId) => isValidObjectId(bookId))
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
   ],
 

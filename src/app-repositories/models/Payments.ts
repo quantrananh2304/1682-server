@@ -1,6 +1,7 @@
 import { Schema, Types, model } from "mongoose";
 import { BaseModelInterface } from "./BaseModelInterface";
 import { USER_COLLECTION_NAME } from "./Users";
+import { BOOK_COLLECTION_NAME, BOOK_CURRENCY } from "./Books";
 
 export const PAYMENT_COLLECTION_NAME = "payments";
 
@@ -10,15 +11,27 @@ export enum PAYMENT_STATUS {
   FAILURE = "FAILURE",
 }
 
-export enum PAYMENT_TYPE {}
+export enum PAYMENT_TYPE {
+  BOOK = "BOOK",
+  SUBSCRIPTION_PLAN = "SUBSCRIPTION_PLAN",
+}
 
 export interface PaymentModelInterface extends BaseModelInterface {
   method: string | Types.ObjectId;
   status: PAYMENT_STATUS;
   amount: string;
+  paymentFor: { paymentType: PAYMENT_TYPE; bookId: string | Types.ObjectId };
+  currency: BOOK_CURRENCY;
 }
 
 const paymentModelSchema = new Schema({
+  paymentFor: {
+    type: {
+      paymentType: PAYMENT_TYPE,
+      bookId: { type: Types.ObjectId, ref: BOOK_COLLECTION_NAME },
+    },
+  },
+
   method: {
     type: Types.ObjectId,
     required: true,
@@ -29,6 +42,12 @@ const paymentModelSchema = new Schema({
     type: String,
     required: true,
     default: "0",
+  },
+
+  currency: {
+    type: BOOK_CURRENCY,
+    required: true,
+    default: BOOK_CURRENCY.VND,
   },
 
   status: {

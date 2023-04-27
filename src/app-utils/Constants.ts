@@ -31,6 +31,8 @@ const CONSTANTS = {
 
   RESET_PASSWORD_CODE_LENGTH: 8,
 
+  MINIMUM_PRICE: 10000,
+
   SERVER_ERROR: {
     USER_EXISTED: {
       errorCode: "01",
@@ -197,6 +199,11 @@ const CONSTANTS = {
       message: "User already unlocked",
     },
 
+    USER_ALR_PURCHASED_BOOK: {
+      errorCode: "035",
+      message: "User already purchased this book",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",
@@ -226,6 +233,8 @@ const CONSTANTS = {
     AMOUNT_INVALID: "Amount invalid",
 
     PAYMENT_STATUS_INVALID: "Payment status invalid",
+
+    BOOK_PRICE_MINIMUM: "Book price must be ${MINIMUM_PRICE} minimum",
   },
 };
 

@@ -7,6 +7,7 @@ import PaymentMethods, {
 import { Types } from "mongoose";
 import Payments, {
   PAYMENT_STATUS,
+  PAYMENT_TYPE,
   PaymentModelInterface,
 } from "@app-repositories/models/Payments";
 
@@ -56,10 +57,11 @@ class PaymentService implements IPaymentService {
     return paymentMethods;
   }
 
-  async createOrder(
+  async createOrderForBook(
     userId: string,
     method: string,
-    amount: string
+    amount: string,
+    bookId: string
   ): Promise<PaymentModelInterface> {
     const payment: PaymentModelInterface = await Payments.create({
       method: Types.ObjectId(method),
@@ -69,6 +71,10 @@ class PaymentService implements IPaymentService {
       createdAt: new Date(),
       updatedAt: new Date(),
       updatedBy: Types.ObjectId(userId),
+      paymentFor: {
+        paymentType: PAYMENT_TYPE.BOOK,
+        bookId: Types.ObjectId(bookId),
+      },
     });
 
     return payment;

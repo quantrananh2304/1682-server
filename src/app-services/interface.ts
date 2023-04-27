@@ -1,4 +1,7 @@
-import { BookModelInterface } from "@app-repositories/models/Books";
+import {
+  BOOK_CURRENCY,
+  BookModelInterface,
+} from "@app-repositories/models/Books";
 import {
   EVENT_ACTION,
   EVENT_SCHEMA,
@@ -248,6 +251,7 @@ export interface IBookService {
       title: string;
       chapters: Array<{ name: string; content: string }>;
       topics: Array<string>;
+      price: number;
     },
     actor: string
   ): Promise<BookModelInterface>;
@@ -307,6 +311,12 @@ export interface IBookService {
     startDate: Date,
     endDate: Date
   ): Promise<Array<BookModelInterface>>;
+
+  addPurchaser(
+    bookId: string,
+    userId: string,
+    price: { amount: number; currency: BOOK_CURRENCY }
+  ): Promise<BookModelInterface>;
 }
 
 export interface IReportService {
@@ -422,10 +432,11 @@ export interface IPaymentService {
 
   getAvailablePaymentMethod(): Promise<Array<PaymentMethodModelInterface>>;
 
-  createOrder(
+  createOrderForBook(
     userId: string,
     method: string,
-    amount: string
+    amount: string,
+    bookId: string
   ): Promise<PaymentModelInterface>;
 
   getPaymentMethodById(

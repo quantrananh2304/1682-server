@@ -5,10 +5,16 @@ import {
   vnp_Url,
 } from "@app-configs";
 import { Request, Response } from "@app-helpers/http.extends";
+import { BookModelInterface } from "@app-repositories/models/Books";
 import { EVENT_ACTION, EVENT_SCHEMA } from "@app-repositories/models/Events";
 import { PaymentMethodModelInterface } from "@app-repositories/models/PaymentMethods";
-import { PaymentModelInterface } from "@app-repositories/models/Payments";
+import {
+  PAYMENT_STATUS,
+  PAYMENT_TYPE,
+  PaymentModelInterface,
+} from "@app-repositories/models/Payments";
 import TYPES from "@app-repositories/types";
+import BookService from "@app-services/BookService";
 import EventService from "@app-services/EventService";
 import PaymentService from "@app-services/PaymentService";
 import CONSTANTS from "@app-utils/Constants";
@@ -24,6 +30,7 @@ const crypto = require("crypto");
 class PaymentController {
   @inject(TYPES.PaymentService) private readonly paymentService: PaymentService;
   @inject(TYPES.EventService) private readonly eventService: EventService;
+  @inject(TYPES.BookService) private readonly bookService: BookService;
 
   async createPaymentMethod(req: Request, res: Response) {
     try {
@@ -83,10 +90,26 @@ class PaymentController {
     }
   }
 
-  async createOrder(req: Request, res: Response) {
+  async createOrderForBook(req: Request, res: Response) {
     try {
       const { userId } = req.headers;
-      const { amount, method } = req.body;
+      const { method, bookId } = req.body;
+
+      const book: BookModelInterface = await this.bookService.getBookById(
+        bookId
+      );
+
+      if (!book || (book && book.hidden.isHidden)) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_NOT_EXIST);
+      }
+
+      const { price } = book;
+
+      if (
+        book.purchaser.map((item: any) => String(item.user)).includes(userId)
+      ) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_ALR_PURCHASED_BOOK);
+      }
 
       const paymentMethod: PaymentMethodModelInterface =
         await this.paymentService.getPaymentMethodById(method);
@@ -96,7 +119,12 @@ class PaymentController {
       }
 
       const payment: PaymentModelInterface =
-        await this.paymentService.createOrder(userId, method, amount);
+        await this.paymentService.createOrderForBook(
+          userId,
+          method,
+          String(price.amount),
+          bookId
+        );
 
       if (!payment) {
         return res.internal({});
@@ -119,7 +147,7 @@ class PaymentController {
       const returnUrl = vnp_ReturnUrl;
       const orderId = format(date, "ddHHmmss");
       const locale = "en";
-      const currCode = "VND";
+      const currCode = price.currency;
       let vnp_Params: any = {};
 
       vnp_Params["vnp_Version"] = "2.1.0";
@@ -133,7 +161,7 @@ class PaymentController {
         "vnp_OrderInfo"
       ] = `User ${userId} paid for order ${payment._id}`;
       vnp_Params["vnp_OrderType"] = "other";
-      vnp_Params["vnp_Amount"] = amount * 100;
+      vnp_Params["vnp_Amount"] = price.amount * 100;
       vnp_Params["vnp_ReturnUrl"] = returnUrl;
       vnp_Params["vnp_IpAddr"] = ipAddr;
       vnp_Params["vnp_CreateDate"] = createDate;
@@ -166,6 +194,27 @@ class PaymentController {
 
       if (!payment) {
         return res.errorRes(CONSTANTS.SERVER_ERROR.PAYMENT_NOT_EXIST);
+      }
+
+      if (
+        payment.paymentFor.paymentType === PAYMENT_TYPE.BOOK &&
+        status === PAYMENT_STATUS.SUCCESS
+      ) {
+        const { bookId } = payment.paymentFor;
+        const { amount, currency } = payment;
+
+        const book: BookModelInterface = await this.bookService.addPurchaser(
+          String(bookId),
+          userId,
+          {
+            amount: Number(amount),
+            currency,
+          }
+        );
+
+        if (!book) {
+          return res.internal({});
+        }
       }
 
       await this.eventService.createEvent({

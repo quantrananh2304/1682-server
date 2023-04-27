@@ -28,6 +28,17 @@ const BookMiddleware = {
           (item) => item.name && item.content && item.name.length <= 50
         )
       ),
+
+    body("price")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isNumeric()
+      .custom((price) => price >= 10000)
+      .withMessage(
+        CONSTANTS.VALIDATION_MESSAGE.BOOK_PRICE_MINIMUM.replace(
+          "${MINIMUM_PRICE}",
+          String(CONSTANTS.MINIMUM_PRICE)
+        )
+      ),
   ],
 
   getListBook: [

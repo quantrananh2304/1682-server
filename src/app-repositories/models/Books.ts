@@ -5,6 +5,11 @@ import { UserModelInterface } from "./Users";
 
 export const BOOK_COLLECTION_NAME = "books";
 
+export enum BOOK_CURRENCY {
+  VND = "VND",
+  USD = "USD",
+}
+
 export interface BookModelInterface extends BaseModelInterface {
   title: string;
   chapters: Array<{
@@ -45,6 +50,12 @@ export interface BookModelInterface extends BaseModelInterface {
     hiddenBy: string | Types.ObjectId;
     hiddenUntil: Date;
   };
+  purchaser: Array<{
+    user: string | Types.ObjectId;
+    createdAt: Date;
+    price: { amount: number; currency: BOOK_CURRENCY };
+  }>;
+  price: { amount: number; currency: BOOK_CURRENCY };
 }
 
 const bookSchema = new Schema({
@@ -152,6 +163,37 @@ const bookSchema = new Schema({
     ],
     default: [],
     _id: false,
+  },
+
+  purchaser: {
+    type: [
+      {
+        user: {
+          type: Types.ObjectId,
+          ref: "users",
+        },
+        createdAt: Date,
+        price: {
+          type: {
+            amount: Number,
+            currency: BOOK_CURRENCY,
+          },
+        },
+      },
+    ],
+    default: [],
+  },
+
+  price: {
+    type: {
+      amount: Number,
+      currency: BOOK_CURRENCY,
+    },
+    required: true,
+    default: {
+      amount: 0,
+      currency: BOOK_CURRENCY.VND,
+    },
   },
 
   hidden: {

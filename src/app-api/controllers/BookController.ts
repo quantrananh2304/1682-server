@@ -27,7 +27,12 @@ class BookController {
 
   async createBook(req: Request, res: Response) {
     try {
-      const { title, chapters, topics } = req.body;
+      const { userRole } = req.headers;
+      const { title, chapters, topics, price } = req.body;
+
+      if (userRole !== USER_ROLE.AUTHOR) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.AUTHOR_ONLY);
+      }
 
       topics.map(async (item: string) => {
         const topic: TopicModelInterface = await this.topicService.getTopicById(
@@ -40,7 +45,7 @@ class BookController {
       });
 
       const book: BookModelInterface = await this.bookService.createBook(
-        { title, chapters, topics },
+        { title, chapters, topics, price },
         req.headers.userId
       );
 
