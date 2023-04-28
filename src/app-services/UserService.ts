@@ -10,6 +10,7 @@ import bcrypt = require("bcryptjs");
 import CONSTANTS from "@app-utils/Constants";
 import { Types } from "mongoose";
 import { stringGenerator } from "@app-utils/utils";
+import { add } from "date-fns";
 
 @injectable()
 class UserService implements IUserService {
@@ -917,6 +918,34 @@ class UserService implements IUserService {
     );
 
     return user;
+  }
+
+  async updateUserSubscriptionPlan(
+    userId: string,
+    validTime: number
+  ): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findById(userId);
+
+    const updatedUser: UserModelInterface = await Users.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          subscriptionPlan: {
+            isSubscribed: true,
+            validUntil: new Date(
+              add(new Date(user.subscriptionPlan.validUntil), {
+                months: validTime,
+              })
+            ),
+          },
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(userId),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return updatedUser;
   }
 }
 

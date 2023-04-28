@@ -47,6 +47,10 @@ export interface UserModelInterface extends BaseModelInterface {
       createdAt: Date;
     }>;
   }>;
+  subscriptionPlan: {
+    isSubscribed: boolean;
+    validUntil: Date;
+  };
 }
 
 const userSchema = new Schema({
@@ -223,6 +227,18 @@ const userSchema = new Schema({
       },
     ],
     default: [],
+  },
+
+  subscriptionPlan: {
+    type: {
+      isSubscribed: Boolean,
+      validUntil: Date,
+    },
+    required: true,
+    default: {
+      isSubscribed: false,
+      validUntil: new Date(),
+    },
   },
 });
 

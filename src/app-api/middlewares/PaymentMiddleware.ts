@@ -35,6 +35,32 @@ const PaymentMiddleware = {
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
   ],
 
+  createOrderForSubscriptionPlan: [
+    body("method")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((method) => isValidObjectId(method))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("amount")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((amount) => Number(amount) && Number(amount) >= 10000)
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.AMOUNT_INVALID),
+
+    body("validTime")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isNumeric()
+      .custom((validTime) => validTime >= 1)
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.VALID_TIME_INVALID),
+
+    body("currency")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((currency) => BOOK_CURRENCY[currency])
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.CURRENCY_INVALID),
+  ],
+
   updateOrderStatus: [
     param("paymentId")
       .exists({ checkFalsy: true, checkNull: true })

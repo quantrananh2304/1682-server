@@ -13,11 +13,12 @@ import {
   PAYMENT_TYPE,
   PaymentModelInterface,
 } from "@app-repositories/models/Payments";
-import { USER_ROLE } from "@app-repositories/models/Users";
+import { USER_ROLE, UserModelInterface } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import BookService from "@app-services/BookService";
 import EventService from "@app-services/EventService";
 import PaymentService from "@app-services/PaymentService";
+import UserService from "@app-services/UserService";
 import CONSTANTS from "@app-utils/Constants";
 import { sortObject } from "@app-utils/utils";
 import { format } from "date-fns";
@@ -32,6 +33,7 @@ class PaymentController {
   @inject(TYPES.PaymentService) private readonly paymentService: PaymentService;
   @inject(TYPES.EventService) private readonly eventService: EventService;
   @inject(TYPES.BookService) private readonly bookService: BookService;
+  @inject(TYPES.UserService) private readonly userService: UserService;
 
   async createPaymentMethod(req: Request, res: Response) {
     try {
@@ -85,6 +87,102 @@ class PaymentController {
       });
 
       return res.successRes({ data: paymentMethods });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  buildVNPayParams(
+    currency: string,
+    vnpOrderInfo: string,
+    amount: number,
+    paymentMethodName: string
+  ): string {
+    const date = new Date();
+    const createDate = format(date, "yyyyMMddHHmmss");
+    const ipAddr = "::1";
+    const tmnCode = vnp_TmnCode;
+    const secretKey = vnp_HashSecret;
+    let vnpUrl = vnp_Url;
+    const returnUrl = vnp_ReturnUrl;
+    const orderId = format(date, "ddHHmmss");
+    const locale = "en";
+    const currCode = currency;
+    let vnp_Params: any = {};
+
+    vnp_Params["vnp_Version"] = "2.1.0";
+    vnp_Params["vnp_Command"] = "pay";
+    vnp_Params["vnp_TmnCode"] = tmnCode;
+    vnp_Params["vnp_Locale"] = locale;
+    vnp_Params["vnp_CurrCode"] = currCode;
+    vnp_Params["vnp_TxnRef"] = orderId;
+    vnp_Params["vnp_OrderInfo"] = vnpOrderInfo;
+
+    vnp_Params["vnp_OrderType"] = "other";
+    vnp_Params["vnp_Amount"] = amount * 100;
+    vnp_Params["vnp_ReturnUrl"] = returnUrl;
+    vnp_Params["vnp_IpAddr"] = ipAddr;
+    vnp_Params["vnp_CreateDate"] = createDate;
+    vnp_Params["vnp_BankCode"] = paymentMethodName;
+
+    vnp_Params = sortObject(vnp_Params);
+
+    const signData = QueryString.stringify(vnp_Params, { encode: false });
+    const hmac = crypto.createHmac("sha512", secretKey);
+    const signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+
+    vnp_Params["vnp_SecureHash"] = signed;
+    vnpUrl += "?" + QueryString.stringify(vnp_Params, { encode: false });
+
+    return vnpUrl;
+  }
+
+  async createOrderForSubscription(req: Request, res: Response) {
+    try {
+      const { userId } = req.headers;
+      const { method, amount, validTime, currency } = req.body;
+
+      const paymentMethod: PaymentMethodModelInterface =
+        await this.paymentService.getPaymentMethodById(method);
+
+      if (!paymentMethod) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.PAYMENT_METHOD_NOT_EXIST);
+      }
+
+      const payment: PaymentModelInterface =
+        await this.paymentService.createOrderForSubscriptionPlan(
+          userId,
+          method,
+          amount
+        );
+
+      if (!payment) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.PAYMENT,
+        action: EVENT_ACTION.CREATE,
+        schemaId: String(payment._id),
+        actor: userId,
+        description: "/payment/create-order-for-subscription",
+      });
+
+      const vnpUrl = this.buildVNPayParams(
+        currency,
+        `{userId:${userId},paymentId:${String(
+          payment._id
+        )},validTime:${validTime}},amount:${amount}`,
+        Number(amount),
+        paymentMethod.name
+      );
+
+      if (!vnpUrl.length) {
+        return res.internal({});
+      }
+
+      return res.successRes({ data: { vnpUrl, paymentId: payment._id } });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.errorMessage });
@@ -188,7 +286,7 @@ class PaymentController {
     try {
       const { userId } = req.headers;
       const { paymentId } = req.params;
-      const { status } = req.body;
+      const { status, validTime } = req.body;
 
       const payment: PaymentModelInterface =
         await this.paymentService.updateOrderStatus(paymentId, status, userId);
@@ -214,6 +312,33 @@ class PaymentController {
         );
 
         if (!book) {
+          return res.internal({});
+        }
+      } else if (
+        payment.paymentFor.paymentType === PAYMENT_TYPE.SUBSCRIPTION_PLAN &&
+        status === PAYMENT_STATUS.SUCCESS
+      ) {
+        if (!validTime) {
+          return res.errorRes(CONSTANTS.SERVER_ERROR.VALID_TIME_REQUIRED);
+        }
+
+        const { createdBy } = payment;
+
+        const user: UserModelInterface = await this.userService.getUserById(
+          String(createdBy)
+        );
+
+        if (!user) {
+          return res.internal({});
+        }
+
+        const updatedUser: UserModelInterface =
+          await this.userService.updateUserSubscriptionPlan(
+            String(createdBy),
+            validTime
+          );
+
+        if (!updatedUser) {
           return res.internal({});
         }
       }

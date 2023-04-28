@@ -204,6 +204,11 @@ const CONSTANTS = {
       message: "User already purchased this book",
     },
 
+    VALID_TIME_REQUIRED: {
+      errorCode: "036",
+      message: "Valid time required",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",
@@ -235,6 +240,10 @@ const CONSTANTS = {
     PAYMENT_STATUS_INVALID: "Payment status invalid",
 
     BOOK_PRICE_MINIMUM: "Book price must be ${MINIMUM_PRICE} minimum",
+
+    VALID_TIME_INVALID: "Valid time invalid",
+
+    CURRENCY_INVALID: "Currency invalid",
   },
 };
 

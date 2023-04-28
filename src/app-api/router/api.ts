@@ -507,6 +507,17 @@ router.get(
   )
 );
 
+router.post(
+  "/payment/create-order-for-subscription",
+  PaymentMiddleware.createOrderForSubscriptionPlan,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PaymentControllerInstance.createOrderForSubscription.bind(
+    PaymentControllerInstance
+  )
+);
+
 // notification
 
 router.get(

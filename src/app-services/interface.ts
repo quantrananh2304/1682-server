@@ -210,6 +210,11 @@ export interface IUserService {
   lockUser(userId: string, actor: string): Promise<UserModelInterface>;
 
   unlockUser(userId: string, actor: string): Promise<UserModelInterface>;
+
+  updateUserSubscriptionPlan(
+    userId: string,
+    validTime: number
+  ): Promise<UserModelInterface>;
 }
 
 export interface IEventService {
@@ -447,6 +452,12 @@ export interface IPaymentService {
     method: string,
     amount: string,
     bookId: string
+  ): Promise<PaymentModelInterface>;
+
+  createOrderForSubscriptionPlan(
+    userId: string,
+    method: string,
+    amount: string
   ): Promise<PaymentModelInterface>;
 
   getPaymentMethodById(

@@ -88,6 +88,28 @@ class PaymentService implements IPaymentService {
     return payment;
   }
 
+  async createOrderForSubscriptionPlan(
+    userId: string,
+    method: string,
+    amount: string
+  ): Promise<PaymentModelInterface> {
+    const payment: PaymentModelInterface = await Payments.create({
+      method: Types.ObjectId(method),
+      amount,
+      status: PAYMENT_STATUS.PENDING,
+      createdBy: Types.ObjectId(userId),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      updatedBy: Types.ObjectId(userId),
+      paymentFor: {
+        paymentType: PAYMENT_TYPE.SUBSCRIPTION_PLAN,
+        bookId: null,
+      },
+    });
+
+    return payment;
+  }
+
   async getPaymentMethodById(
     paymentMethodId: string
   ): Promise<PaymentMethodModelInterface> {
@@ -257,7 +279,10 @@ class PaymentService implements IPaymentService {
     });
 
     return {
-      payments: matchedPayment.slice((page - 1) * limit, page - 1 + limit),
+      payments: matchedPayment.slice(
+        (page - 1) * limit,
+        (page - 1) * limit + limit
+      ),
       total: matchedPayment.length,
       page: page,
       totalPage:
@@ -364,7 +389,10 @@ class PaymentService implements IPaymentService {
     });
 
     return {
-      payments: matchedPayment.slice((page - 1) * limit, page - 1 + limit),
+      payments: matchedPayment.slice(
+        (page - 1) * limit,
+        (page - 1) * limit + limit
+      ),
       total: matchedPayment.length,
       page: page,
       totalPage:
