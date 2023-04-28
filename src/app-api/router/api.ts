@@ -488,6 +488,15 @@ router.put(
   PaymentControllerInstance.updateOrderStatus.bind(PaymentControllerInstance)
 );
 
+router.get(
+  "/admin/payment/list",
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAdmin,
+  PaymentControllerInstance.getListPayment.bind(PaymentControllerInstance)
+);
+
 // notification
 
 router.get(

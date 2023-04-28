@@ -14,6 +14,7 @@ import {
 import { PaymentMethodModelInterface } from "@app-repositories/models/PaymentMethods";
 import {
   PAYMENT_STATUS,
+  PAYMENT_TYPE,
   PaymentModelInterface,
 } from "@app-repositories/models/Payments";
 import { PostModelInterface } from "@app-repositories/models/Posts";
@@ -100,6 +101,13 @@ export enum GET_LIST_POST_SORT {
   COMMENT_DESC = "COMMENT_DESC",
   DATE_CREATED_ASC = "DATE_CREATED_ASC",
   DATE_CREATED_DESC = "DATE_CREATED_DESC",
+}
+
+export enum GET_LIST_PAYMENT_SORT {
+  AMOUNT_ASC = "AMOUNT_ASC",
+  AMOUNT_DESC = "AMOUNT_DESC",
+  DATE_CREATED_DESC = "DATE_CREATED_DESC",
+  DATE_CREATED_ASC = "DATE_CREATED_ASC",
 }
 
 export interface IUserService {
@@ -448,6 +456,23 @@ export interface IPaymentService {
     status: PAYMENT_STATUS,
     userId: string
   ): Promise<PaymentModelInterface>;
+
+  getListPayment(filter: {
+    page: number;
+    limit: number;
+    sort: GET_LIST_PAYMENT_SORT;
+    keyword: string;
+    filteredBy: {
+      status: Array<PAYMENT_STATUS>;
+      currency: Array<BOOK_CURRENCY>;
+      paymentType: Array<PAYMENT_TYPE>;
+    };
+  }): Promise<{
+    total: number;
+    page: number;
+    payments: Array<PaymentModelInterface>;
+    totalPage: number;
+  }>;
 }
 
 export interface INotificationService {

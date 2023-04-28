@@ -1,5 +1,5 @@
-import { injectable } from "inversify";
-import { IPaymentService } from "./interface";
+import { inject, injectable } from "inversify";
+import { GET_LIST_PAYMENT_SORT, IPaymentService } from "./interface";
 import PaymentMethods, {
   PAYMENT_METHOD_STATUS,
   PaymentMethodModelInterface,
@@ -10,9 +10,17 @@ import Payments, {
   PAYMENT_TYPE,
   PaymentModelInterface,
 } from "@app-repositories/models/Payments";
+import {
+  BOOK_CURRENCY,
+  BookModelInterface,
+} from "@app-repositories/models/Books";
+import TYPES from "@app-repositories/types";
+import BookService from "./BookService";
 
 @injectable()
 class PaymentService implements IPaymentService {
+  @inject(TYPES.BookService) private readonly bookService: BookService;
+
   async createPaymentMethod(
     userId: string,
     name: string,
@@ -107,6 +115,156 @@ class PaymentService implements IPaymentService {
     );
 
     return payment;
+  }
+
+  async getListPayment(filter: {
+    page: number;
+    limit: number;
+    sort: GET_LIST_PAYMENT_SORT;
+    keyword: string;
+    filteredBy: {
+      status: PAYMENT_STATUS[];
+      currency: BOOK_CURRENCY[];
+      paymentType: PAYMENT_TYPE[];
+    };
+  }): Promise<{
+    total: number;
+    page: number;
+    payments: any[];
+    totalPage: number;
+  }> {
+    const { page, limit, keyword, filteredBy } = filter;
+
+    // const skip = page * limit;
+
+    let sort = {};
+
+    switch (filter.sort) {
+      case GET_LIST_PAYMENT_SORT.AMOUNT_ASC:
+        sort = { amount: 1 };
+        break;
+
+      case GET_LIST_PAYMENT_SORT.AMOUNT_DESC:
+        sort = { amount: -1 };
+        break;
+
+      case GET_LIST_PAYMENT_SORT.DATE_CREATED_ASC:
+        sort = { createdAt: 1 };
+        break;
+
+      case GET_LIST_PAYMENT_SORT.DATE_CREATED_DESC:
+        sort = { createdAt: -1 };
+        break;
+
+      default:
+        break;
+    }
+
+    const matcher: any = {};
+
+    if (filteredBy.currency && filteredBy.currency.length) {
+      matcher.$and = [
+        {
+          currency: {
+            $in: filteredBy.currency,
+          },
+        },
+      ];
+    }
+
+    if (filteredBy.paymentType && filteredBy.paymentType.length) {
+      if (matcher.$and) {
+        matcher.$and.push({
+          "paymentFor.paymentType": {
+            $in: filteredBy.paymentType,
+          },
+        });
+      } else {
+        matcher.$and = [
+          {
+            "paymentFor.paymentType": {
+              $in: filteredBy.paymentType,
+            },
+          },
+        ];
+      }
+    }
+
+    if (filteredBy.status && filteredBy.status.length) {
+      if (matcher.$and) {
+        matcher.$and.push({
+          status: {
+            $in: filteredBy.status,
+          },
+        });
+      } else {
+        matcher.$and = [
+          {
+            status: {
+              $in: filteredBy.status,
+            },
+          },
+        ];
+      }
+    }
+
+    const payments: Array<any> = await Payments.find(matcher)
+      .populate({ path: "method", select: "-_v -updatedBy" })
+      .populate({ path: "createdBy", select: "_id firstName lastName avatar" })
+      .sort(sort)
+      .lean();
+
+    const handlePopulateArray = (arr: any) => {
+      const promises = arr.map(async (item: any) => {
+        if (item.paymentFor) {
+          const { paymentType } = item.paymentFor;
+
+          if (paymentType === PAYMENT_TYPE.BOOK) {
+            const book: BookModelInterface = await this.bookService.getBookById(
+              String(item._id)
+            );
+
+            return {
+              ...item,
+              paymentFor: { ...item.paymentFor, bookId: book },
+            };
+          }
+
+          return item;
+        }
+
+        return item;
+      });
+
+      return Promise.all(promises);
+    };
+
+    const modifiedPayment = await handlePopulateArray(payments);
+
+    const matchedPayment = modifiedPayment.filter((item: any) => {
+      const { paymentFor } = item;
+
+      if (!paymentFor.bookId) {
+        return true;
+      } else {
+        return (
+          item.paymentFor.bookId.title.includes(keyword) ||
+          (item.createdBy.firstName + " " + item.createdBy.lastName).includes(
+            keyword
+          )
+        );
+      }
+    });
+
+    return {
+      payments: matchedPayment.slice((page - 1) * limit, page - 1 + limit),
+      total: matchedPayment.length,
+      page: page + 1,
+      totalPage:
+        matchedPayment.length % limit === 0
+          ? matchedPayment.length / limit
+          : Math.floor(matchedPayment.length / limit) + 1,
+    };
   }
 }
 

@@ -231,6 +231,42 @@ class PaymentController {
       return res.internal({ message: error.errorMessage });
     }
   }
+
+  async getListPayment(req: Request, res: Response) {
+    try {
+      const { page, limit, sort, keyword, status, currency, paymentType } =
+        req.query;
+
+      const payment = await this.paymentService.getListPayment({
+        page: Number(page),
+        limit: Number(limit),
+        sort,
+        keyword: keyword || "",
+        filteredBy: {
+          status: status || [],
+          currency: currency || [],
+          paymentType: paymentType || [],
+        },
+      });
+
+      if (!payment) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.PAYMENT,
+        action: EVENT_ACTION.READ,
+        schemaId: null,
+        actor: String(req.headers.userId),
+        description: "/payment/list",
+      });
+
+      return res.successRes({ data: payment });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
 }
 
 export default PaymentController;
