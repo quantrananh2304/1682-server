@@ -173,7 +173,9 @@ class PaymentController {
         currency,
         `{userId:${userId},paymentId:${String(
           payment._id
-        )},validTime:${validTime}},amount:${amount}`,
+        )},validTime:${validTime}},amount:${amount},paymentType:${
+          PAYMENT_TYPE.SUBSCRIPTION_PLAN
+        }`,
         Number(amount),
         paymentMethod.name
       );
@@ -256,9 +258,12 @@ class PaymentController {
       vnp_Params["vnp_CurrCode"] = currCode;
       vnp_Params["vnp_TxnRef"] = orderId;
       // vnp_Params["vnp_OrderInfo"] = "Payment for order:" + orderId;
-      vnp_Params[
-        "vnp_OrderInfo"
-      ] = `User ${userId} paid for order ${payment._id}`;
+      // vnp_Params[
+      // "vnp_OrderInfo"
+      // ] = `User ${userId} paid for order ${payment._id}`;
+      vnp_Params["vnp_OrderInfo"] = `{paymentType:${
+        PAYMENT_TYPE.BOOK
+      },bookId:${bookId},paymentId:${String(payment._id)}}`;
       vnp_Params["vnp_OrderType"] = "other";
       vnp_Params["vnp_Amount"] = price.amount * 100;
       vnp_Params["vnp_ReturnUrl"] = returnUrl;
