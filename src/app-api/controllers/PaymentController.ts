@@ -13,6 +13,7 @@ import {
   PAYMENT_TYPE,
   PaymentModelInterface,
 } from "@app-repositories/models/Payments";
+import { USER_ROLE } from "@app-repositories/models/Users";
 import TYPES from "@app-repositories/types";
 import BookService from "@app-services/BookService";
 import EventService from "@app-services/EventService";
@@ -259,6 +260,54 @@ class PaymentController {
         schemaId: null,
         actor: String(req.headers.userId),
         description: "/payment/list",
+      });
+
+      return res.successRes({ data: payment });
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.errorMessage });
+    }
+  }
+
+  async getListPaymentForAuthor(req: Request, res: Response) {
+    try {
+      const { page, limit, sort, keyword, currency } = req.query;
+      const { userId, userRole } = req.headers;
+
+      if (userRole !== USER_ROLE.AUTHOR) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.AUTHOR_ONLY);
+      }
+
+      const books: Array<BookModelInterface> =
+        await this.bookService.getBookListByUserId(userId);
+
+      if (!books) {
+        return res.internal({});
+      }
+
+      const payment = await this.paymentService.getListPaymentForAuthor(
+        books.map((item) => String(item._id)),
+        {
+          page: Number(page),
+          limit: Number(limit),
+          sort,
+          keyword: keyword || "",
+          filteredBy: {
+            currency: currency || [],
+          },
+        }
+      );
+
+      if (!payment) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.PAYMENT,
+        action: EVENT_ACTION.READ,
+        schemaId: null,
+        actor: userId,
+        description: "/payment/list-for-author",
       });
 
       return res.successRes({ data: payment });

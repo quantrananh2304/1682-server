@@ -497,6 +497,16 @@ router.get(
   PaymentControllerInstance.getListPayment.bind(PaymentControllerInstance)
 );
 
+router.get(
+  "/author/payment/list",
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  PaymentControllerInstance.getListPaymentForAuthor.bind(
+    PaymentControllerInstance
+  )
+);
+
 // notification
 
 router.get(

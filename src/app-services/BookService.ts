@@ -1021,6 +1021,16 @@ class BookService implements IBookService {
 
     return book;
   }
+
+  async getBookListByUserId(
+    userId: string
+  ): Promise<Array<BookModelInterface>> {
+    const books: Array<BookModelInterface> = await Books.find({
+      createdBy: Types.ObjectId(userId),
+    });
+
+    return books;
+  }
 }
 
 export default BookService;

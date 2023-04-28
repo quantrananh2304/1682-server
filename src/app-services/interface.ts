@@ -325,6 +325,8 @@ export interface IBookService {
     userId: string,
     price: { amount: number; currency: BOOK_CURRENCY }
   ): Promise<BookModelInterface>;
+
+  getBookListByUserId(userId: string): Promise<Array<BookModelInterface>>;
 }
 
 export interface IReportService {
@@ -470,7 +472,25 @@ export interface IPaymentService {
   }): Promise<{
     total: number;
     page: number;
-    payments: Array<PaymentModelInterface>;
+    payments: Array<any>;
+    totalPage: number;
+  }>;
+
+  getListPaymentForAuthor(
+    bookIds: Array<string>,
+    filter: {
+      page: number;
+      limit: number;
+      sort: GET_LIST_PAYMENT_SORT;
+      keyword: string;
+      filteredBy: {
+        currency: Array<BOOK_CURRENCY>;
+      };
+    }
+  ): Promise<{
+    total: number;
+    page: number;
+    payments: Array<any>;
     totalPage: number;
   }>;
 }

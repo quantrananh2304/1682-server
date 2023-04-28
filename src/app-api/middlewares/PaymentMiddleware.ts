@@ -116,6 +116,42 @@ const PaymentMiddleware = {
       return false;
     }),
   ],
+
+  getListPaymentForAuthor: [
+    query("page").exists({ checkNull: true }).isInt({ min: 1 }),
+
+    query("limit")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isInt({ min: 5 }),
+
+    query("sort")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((sort: string) => {
+        if (!GET_LIST_PAYMENT_SORT[sort]) {
+          return false;
+        }
+
+        return true;
+      })
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.SORT_OPTION_INVALID),
+
+    query("currency").custom((currency) => {
+      if (!currency) {
+        return true;
+      }
+
+      if (Array.isArray(currency)) {
+        if (!currency.length) {
+          return true;
+        } else {
+          return currency.every((item) => BOOK_CURRENCY[item]);
+        }
+      }
+
+      return false;
+    }),
+  ],
 };
 
 export default PaymentMiddleware;
