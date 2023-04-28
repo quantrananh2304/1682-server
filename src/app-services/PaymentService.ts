@@ -219,7 +219,7 @@ class PaymentService implements IPaymentService {
         if (item.paymentFor) {
           const { paymentType, bookId } = item.paymentFor;
 
-          if (paymentType === PAYMENT_TYPE.BOOK) {
+          if (paymentType === PAYMENT_TYPE.BOOK && bookId) {
             const book: BookModelInterface = await this.bookService.getBookById(
               String(bookId)
             );
