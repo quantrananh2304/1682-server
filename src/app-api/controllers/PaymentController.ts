@@ -173,9 +173,9 @@ class PaymentController {
         currency,
         `{userId:${userId},paymentId:${String(
           payment._id
-        )},validTime:${validTime}},amount:${amount},paymentType:${
+        )},validTime:${validTime},amount:${amount},paymentType:${
           PAYMENT_TYPE.SUBSCRIPTION_PLAN
-        }`,
+        }}`,
         Number(amount),
         paymentMethod.name
       );
