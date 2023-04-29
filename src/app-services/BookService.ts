@@ -619,6 +619,7 @@ class BookService implements IBookService {
           createdBy: 1,
           createdAt: 1,
           price: 1,
+          purchaser: 1,
 
           chapterCount: {
             $cond: {

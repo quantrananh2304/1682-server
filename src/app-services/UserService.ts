@@ -628,6 +628,8 @@ class UserService implements IUserService {
               else: 0,
             },
           },
+
+          subscriptionPlan: 1,
         },
       },
     ];
