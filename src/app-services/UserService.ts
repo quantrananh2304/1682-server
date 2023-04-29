@@ -947,6 +947,18 @@ class UserService implements IUserService {
 
     return updatedUser;
   }
+
+  async makeUserAuthor(userId: string): Promise<UserModelInterface> {
+    const user: UserModelInterface = await Users.findByIdAndUpdate(
+      userId,
+      {
+        $set: { role: USER_ROLE.AUTHOR, updatedAt: new Date() },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return user;
+  }
 }
 
 export default UserService;

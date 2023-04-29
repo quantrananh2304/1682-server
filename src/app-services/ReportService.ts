@@ -149,6 +149,63 @@ class ReportService implements IReportService {
         total % limit === 0 ? total / limit : Math.floor(total / limit) + 1,
     };
   }
+
+  async getRegisterAuthorStatus(userId: string): Promise<ReportModelInterface> {
+    const report: ReportModelInterface = await Reports.findOne({
+      createdBy: Types.ObjectId(userId),
+      type: REPORT_TYPE.REGISTER_FOR_AUTHOR,
+    });
+
+    return report;
+  }
+
+  async handleRegisterForAuthor(
+    reportId: string,
+    status: REPORT_STATUS,
+    actor: string
+  ): Promise<ReportModelInterface> {
+    const report: ReportModelInterface = await Reports.findByIdAndUpdate(
+      reportId,
+      {
+        $set: {
+          status,
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return report;
+  }
+
+  async getReportById(reportId: string): Promise<ReportModelInterface> {
+    const report: ReportModelInterface = await Reports.findById(
+      reportId
+    ).lean();
+
+    return report;
+  }
+
+  async updateReportStatus(
+    reportId: string,
+    status: REPORT_STATUS,
+    actor: string
+  ): Promise<ReportModelInterface> {
+    const report: ReportModelInterface = await Reports.findByIdAndUpdate(
+      reportId,
+      {
+        $set: {
+          status,
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return report;
+  }
 }
 
 export default ReportService;

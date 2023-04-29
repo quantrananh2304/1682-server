@@ -20,6 +20,7 @@ import {
 import { PostModelInterface } from "@app-repositories/models/Posts";
 import {
   REPORT_SCHEMA,
+  REPORT_STATUS,
   REPORT_TYPE,
   ReportModelInterface,
 } from "@app-repositories/models/Reports";
@@ -215,6 +216,8 @@ export interface IUserService {
     userId: string,
     validTime: number
   ): Promise<UserModelInterface>;
+
+  makeUserAuthor(userId: string, actor: string): Promise<UserModelInterface>;
 }
 
 export interface IEventService {
@@ -266,7 +269,8 @@ export interface IBookService {
       topics: Array<string>;
       price: number;
     },
-    actor: string
+    actor: string,
+    isRegisterForAuthor?: boolean
   ): Promise<BookModelInterface>;
 
   getBookById(_id: string): Promise<BookModelInterface>;
@@ -291,6 +295,8 @@ export interface IBookService {
     hiddenUntil: string,
     actor: string
   ): Promise<BookModelInterface>;
+
+  showBook(bookId: string, actor: string): Promise<BookModelInterface>;
 
   commentBook(
     bookId: string,
@@ -362,6 +368,22 @@ export interface IReportService {
     total: number;
     totalPage: number;
   }>;
+
+  getRegisterAuthorStatus(userId: string): Promise<ReportModelInterface>;
+
+  handleRegisterForAuthor(
+    reportId: string,
+    status: REPORT_STATUS,
+    actor: string
+  ): Promise<ReportModelInterface>;
+
+  getReportById(reportId: string): Promise<ReportModelInterface>;
+
+  updateReportStatus(
+    reportId: string,
+    status: REPORT_STATUS,
+    actor: string
+  ): Promise<ReportModelInterface>;
 }
 
 export interface IPostService {

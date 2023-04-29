@@ -215,6 +215,15 @@ router.put(
   UserControllerInstance.toggleUserStatus.bind(UserControllerInstance)
 );
 
+router.post(
+  "/user/register-for-author",
+  UserMiddleware.registerForAuthor,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  UserControllerInstance.registerForAuthor.bind(UserControllerInstance)
+);
+
 // auth
 router.post(
   "/auth/login",
@@ -365,6 +374,16 @@ router.get(
   TokenValidation.checkToken,
   TokenValidation.checkAdmin,
   ReportControllerInstance.getListReport.bind(ReportControllerInstance)
+);
+
+router.put(
+  "/admin/report/:reportId/update-status",
+  ReportMiddleware.updateReportStatus,
+  ParamsValidations.validationRequest,
+  ParamsValidations.preventUnknownData,
+  TokenValidation.checkToken,
+  TokenValidation.checkAdmin,
+  ReportControllerInstance.updateReportStatus.bind(ReportControllerInstance)
 );
 
 // post

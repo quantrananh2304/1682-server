@@ -20,6 +20,14 @@ import { PostModelInterface } from "@app-repositories/models/Posts";
 import PostService from "@app-services/PostService";
 import NotificationService from "@app-services/NotificationService";
 import { NOTIFICATION_TYPE } from "@app-repositories/models/Notifications";
+import ReportService from "@app-services/ReportService";
+import {
+  REPORT_SCHEMA,
+  REPORT_TYPE,
+  ReportModelInterface,
+} from "@app-repositories/models/Reports";
+import { TopicModelInterface } from "@app-repositories/models/Topics";
+import TopicService from "@app-services/TopicService";
 
 @injectable()
 class UserController {
@@ -30,6 +38,8 @@ class UserController {
   @inject(TYPES.PostService) private readonly postService: PostService;
   @inject(TYPES.NotificationService)
   private readonly notificationService: NotificationService;
+  @inject(TYPES.ReportService) private readonly reportService: ReportService;
+  @inject(TYPES.TopicService) private readonly topicService: TopicService;
 
   async getUserProfile(req: Request, res: Response) {
     try {
@@ -43,6 +53,9 @@ class UserController {
         return res.errorRes(CONSTANTS.SERVER_ERROR.USER_NOT_EXIST);
       }
 
+      const report: ReportModelInterface =
+        await this.reportService.getRegisterAuthorStatus(userId);
+
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.USER,
         action: EVENT_ACTION.READ,
@@ -51,7 +64,12 @@ class UserController {
         description: "/user/profile",
       });
 
-      return res.successRes({ data: user });
+      return res.successRes({
+        data: {
+          ...user,
+          registerForAuthorStatus: report ? report.status : null,
+        },
+      });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.message });
@@ -931,6 +949,79 @@ class UserController {
 
         return res.successRes({ data: {} });
       }
+    } catch (error) {
+      console.log("error", error);
+      return res.internal({ message: error.message });
+    }
+  }
+
+  async registerForAuthor(req: Request, res: Response) {
+    try {
+      const { userRole, userId } = req.headers;
+      const { title, chapters, topics, message } = req.body;
+
+      if (userRole === USER_ROLE.AUTHOR) {
+        return res.errorRes(CONSTANTS.SERVER_ERROR.USER_ALR_BE_AUTHOR);
+      }
+
+      const existedReport: ReportModelInterface =
+        await this.reportService.getRegisterAuthorStatus(userId);
+
+      if (existedReport) {
+        return res.errorRes(
+          CONSTANTS.SERVER_ERROR.USER_ALR_REGISTER_FOR_AUTHOR
+        );
+      }
+
+      topics.map(async (item: string) => {
+        const topic: TopicModelInterface = await this.topicService.getTopicById(
+          item
+        );
+
+        if (!topic) {
+          return res.errorRes(CONSTANTS.SERVER_ERROR.TOPIC_NOT_EXIST);
+        }
+      });
+
+      const book: BookModelInterface = await this.bookService.createBook(
+        {
+          title,
+          chapters,
+          topics,
+          price: 0,
+        },
+        userId
+      );
+
+      if (!book) {
+        return res.internal({});
+      }
+
+      const report: ReportModelInterface =
+        await this.reportService.createReport(
+          {
+            title: CONSTANTS.REGISTER_FOR_AUTHOR,
+            content: message,
+            type: REPORT_TYPE.REGISTER_FOR_AUTHOR,
+            schema: REPORT_SCHEMA.books,
+            schemaId: String(book._id),
+          },
+          userId
+        );
+
+      if (!report) {
+        return res.internal({});
+      }
+
+      await this.eventService.createEvent({
+        schema: EVENT_SCHEMA.REPORT,
+        action: EVENT_ACTION.CREATE,
+        schemaId: String(book._id),
+        actor: userId,
+        description: "/report/register-for-author",
+      });
+
+      return res.successRes({ data: report });
     } catch (error) {
       console.log("error", error);
       return res.internal({ message: error.message });

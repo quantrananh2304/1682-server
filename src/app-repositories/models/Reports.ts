@@ -7,6 +7,7 @@ export const REPORT_COLLECTION_NAME = "reports";
 export enum REPORT_TYPE {
   REPORT = "REPORT",
   FEEDBACK = "FEEDBACK",
+  REGISTER_FOR_AUTHOR = "REPORT_FOR_AUTHOR",
 }
 
 export enum REPORT_SCHEMA {
@@ -18,6 +19,8 @@ export enum REPORT_SCHEMA {
 export enum REPORT_STATUS {
   PENDING = "PENDING",
   RESOLVED = "RESOLVED",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
 }
 
 export interface ReportModelInterface extends BaseModelInterface {

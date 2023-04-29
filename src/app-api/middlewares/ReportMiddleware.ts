@@ -1,7 +1,11 @@
-import { REPORT_SCHEMA, REPORT_TYPE } from "@app-repositories/models/Reports";
+import {
+  REPORT_SCHEMA,
+  REPORT_STATUS,
+  REPORT_TYPE,
+} from "@app-repositories/models/Reports";
 import { GET_LIST_REPORT_SORT } from "@app-services/interface";
 import CONSTANTS from "@app-utils/Constants";
-import { body, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import { isValidObjectId } from "mongoose";
 
 const ReportMiddleware = {
@@ -61,6 +65,20 @@ const ReportMiddleware = {
         return true;
       })
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.SORT_OPTION_INVALID),
+  ],
+
+  updateReportStatus: [
+    param("reportId")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((reportId) => isValidObjectId(reportId))
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("status")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .custom((status) => REPORT_STATUS[status])
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.STATUS_INVALID),
   ],
 };
 

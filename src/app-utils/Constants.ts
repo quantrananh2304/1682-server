@@ -33,6 +33,10 @@ const CONSTANTS = {
 
   MINIMUM_PRICE: 10000,
 
+  REGISTER_FOR_AUTHOR: "Register for author",
+
+  WARN_FOR_VIOLATION: "Warned for violation",
+
   SERVER_ERROR: {
     USER_EXISTED: {
       errorCode: "01",
@@ -209,6 +213,21 @@ const CONSTANTS = {
       message: "Valid time required",
     },
 
+    USER_ALR_BE_AUTHOR: {
+      errorCode: "037",
+      message: "User already is author",
+    },
+
+    USER_ALR_REGISTER_FOR_AUTHOR: {
+      errorCode: "038",
+      message: "User already registered for author",
+    },
+
+    REPORT_NOT_EXIST: {
+      errorCode: "039",
+      message: "Report not exist",
+    },
+
     AUTHORIZATION_UNAUTHORIZED: {
       errorCode: "401",
       message: "Unauthorized",
@@ -244,6 +263,8 @@ const CONSTANTS = {
     VALID_TIME_INVALID: "Valid time invalid",
 
     CURRENCY_INVALID: "Currency invalid",
+
+    STATUS_INVALID: "Status invalid",
   },
 };
 

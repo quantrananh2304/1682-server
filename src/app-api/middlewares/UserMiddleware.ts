@@ -2,6 +2,7 @@ import { GET_LIST_USER_SORT } from "@app-services/interface";
 import CONSTANTS from "@app-utils/Constants";
 import { body, param, query } from "express-validator";
 import { isValidObjectId } from "mongoose";
+import _ = require("lodash");
 
 const UserMiddleware = {
   register: [
@@ -326,6 +327,35 @@ const UserMiddleware = {
       .isString()
       .custom((action) => action === "lock" || action === "unlock")
       .withMessage(CONSTANTS.VALIDATION_MESSAGE.ACTION_INVALID),
+  ],
+
+  registerForAuthor: [
+    body("title")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .isLength({ max: 50 }),
+
+    body("topics")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isArray({ min: 1 })
+      .custom((topics: Array<string>) =>
+        topics.every((item) => isValidObjectId(item) && _.isString(item))
+      )
+      .withMessage(CONSTANTS.VALIDATION_MESSAGE.OBJECTID_INVALID),
+
+    body("chapters")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isArray({ min: 1 })
+      .custom((chapters: Array<{ name: string; content: string }>) =>
+        chapters.every(
+          (item) => item.name && item.content && item.name.length <= 50
+        )
+      ),
+
+    body("message")
+      .exists({ checkFalsy: true, checkNull: true })
+      .isString()
+      .isLength({ max: 255 }),
   ],
 };
 

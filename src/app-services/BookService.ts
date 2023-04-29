@@ -26,7 +26,8 @@ class BookService implements IBookService {
       topics: string[];
       price: number;
     },
-    actor: string
+    actor: string,
+    isRegisterForAuthor?: boolean
   ): Promise<BookModelInterface> {
     const { title, chapters, topics, price } = _book;
     const book: BookModelInterface = await Books.create({
@@ -38,11 +39,17 @@ class BookService implements IBookService {
       comments: [],
       topics,
       subscribedUsers: [],
-      hidden: {
-        isHidden: false,
-        hiddenBy: null,
-        hiddenUntil: null,
-      },
+      hidden: isRegisterForAuthor
+        ? {
+            isHidden: false,
+            hiddenBy: null,
+            hiddenUntil: null,
+          }
+        : {
+            isHidden: true,
+            hiddenBy: Types.ObjectId(actor),
+            hiddenUntil: null,
+          },
       createdAt: new Date(),
       updatedAt: new Date(),
       updatedBy: Types.ObjectId(actor),
@@ -705,6 +712,26 @@ class BookService implements IBookService {
             isHidden: true,
             hiddenBy: Types.ObjectId(actor),
             hiddenUntil: new Date(hiddenUntil),
+          },
+          updatedAt: new Date(),
+          updatedBy: Types.ObjectId(actor),
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    return book;
+  }
+
+  async showBook(bookId: string, actor: string): Promise<BookModelInterface> {
+    const book: BookModelInterface = await Books.findByIdAndUpdate(
+      bookId,
+      {
+        $set: {
+          hidden: {
+            isHidden: false,
+            hiddenBy: null,
+            hiddenUntil: null,
           },
           updatedAt: new Date(),
           updatedBy: Types.ObjectId(actor),
