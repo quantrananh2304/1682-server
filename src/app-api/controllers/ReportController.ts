@@ -188,17 +188,6 @@ class ReportController {
           );
 
           if (!book) {
-            const updatedReport: ReportModelInterface =
-              await this.reportService.updateReportStatus(
-                reportId,
-                REPORT_STATUS.RESOLVED,
-                userId
-              );
-
-            if (!updatedReport) {
-              return res.internal({});
-            }
-
             return res.errorRes(CONSTANTS.SERVER_ERROR.BOOK_NOT_EXIST);
           }
 
@@ -211,6 +200,17 @@ class ReportController {
               );
 
             if (!updatedBook) {
+              return res.internal({});
+            }
+
+            const updatedReport: ReportModelInterface =
+              await this.reportService.updateReportStatus(
+                reportId,
+                REPORT_STATUS.RESOLVED,
+                userId
+              );
+
+            if (!updatedReport) {
               return res.internal({});
             }
 
