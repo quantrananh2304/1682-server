@@ -175,7 +175,7 @@ class PaymentController {
           payment._id
         )}","validTime":"${validTime}","amount":"${amount}","paymentType":"${
           PAYMENT_TYPE.SUBSCRIPTION_PLAN
-        }}"`,
+        }"}`,
         Number(amount),
         paymentMethod.name
       );
