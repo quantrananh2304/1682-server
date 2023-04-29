@@ -439,6 +439,7 @@ class BookController {
       const commentCount = book.comments.length;
       const chapterCount = book.chapters.length;
       const subscriberCount = book.subscribedUsers.length;
+      const purchaserCount = book.purchaser.length;
 
       await this.eventService.createEvent({
         schema: EVENT_SCHEMA.BOOK,
@@ -457,6 +458,7 @@ class BookController {
           chapterCount,
           commentCount,
           subscriberCount,
+          purchaserCount,
         },
       });
     } catch (error) {
