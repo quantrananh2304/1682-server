@@ -171,11 +171,11 @@ class PaymentController {
 
       const vnpUrl = this.buildVNPayParams(
         currency,
-        `{userId:${userId},paymentId:${String(
+        `{"userId":"${userId}","paymentId":"${String(
           payment._id
-        )},validTime:${validTime},amount:${amount},paymentType:${
+        )}","validTime":"${validTime}","amount":"${amount}","paymentType":"${
           PAYMENT_TYPE.SUBSCRIPTION_PLAN
-        }}`,
+        }}"`,
         Number(amount),
         paymentMethod.name
       );
@@ -261,9 +261,9 @@ class PaymentController {
       // vnp_Params[
       // "vnp_OrderInfo"
       // ] = `User ${userId} paid for order ${payment._id}`;
-      vnp_Params["vnp_OrderInfo"] = `{paymentType:${
+      vnp_Params["vnp_OrderInfo"] = `{"paymentType":"${
         PAYMENT_TYPE.BOOK
-      },bookId:${bookId},paymentId:${String(payment._id)}}`;
+      }","bookId":"${bookId}","paymentId":"${String(payment._id)}"}`;
       vnp_Params["vnp_OrderType"] = "other";
       vnp_Params["vnp_Amount"] = price.amount * 100;
       vnp_Params["vnp_ReturnUrl"] = returnUrl;
