@@ -16,6 +16,8 @@ import {
 } from "@app-repositories/models/Books";
 import TYPES from "@app-repositories/types";
 import BookService from "./BookService";
+import { sub } from "date-fns";
+import Users, { UserModelInterface } from "@app-repositories/models/Users";
 
 @injectable()
 class PaymentService implements IPaymentService {
@@ -400,6 +402,32 @@ class PaymentService implements IPaymentService {
           ? matchedPayment.length / limit
           : Math.floor(matchedPayment.length / limit) + 1,
     };
+  }
+
+  async updateOverduePayment(): Promise<Array<PaymentModelInterface>> {
+    const adminUser: UserModelInterface = await Users.findOne({
+      username: "admin",
+    }).lean();
+
+    const updatedPayment: Array<PaymentModelInterface> =
+      await Payments.updateMany(
+        {
+          status: PAYMENT_STATUS.PENDING,
+          createdAt: {
+            $lte: sub(new Date(), { minutes: 60 }),
+          },
+        },
+        {
+          $set: {
+            status: PAYMENT_STATUS.FAILURE,
+            updatedAt: new Date(),
+            updatedBy: adminUser._id,
+          },
+        },
+        { new: true, useFindAndModify: false }
+      ).lean();
+
+    return updatedPayment;
   }
 }
 

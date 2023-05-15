@@ -6,6 +6,7 @@ import * as cors from "cors";
 import * as helmet from "helmet";
 import { httpResponse } from "@app-helpers";
 import { api } from "@app-api/router";
+import cronJob from "@app-helpers/cronJob";
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
@@ -52,5 +53,6 @@ app.use(express.urlencoded({ extended: true, limit: "100mb" }));
 // return response
 app.use(httpResponse);
 app.use("/api", api);
+cronJob();
 
 export default server;

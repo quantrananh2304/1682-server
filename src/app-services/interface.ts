@@ -526,6 +526,8 @@ export interface IPaymentService {
     payments: Array<any>;
     totalPage: number;
   }>;
+
+  updateOverduePayment(): Promise<Array<PaymentModelInterface>>;
 }
 
 export interface INotificationService {
