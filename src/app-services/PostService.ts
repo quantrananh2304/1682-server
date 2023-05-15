@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { GET_LIST_POST_SORT, IPostService } from "./interface";
 import Posts, { PostModelInterface } from "@app-repositories/models/Posts";
 import { Types } from "mongoose";
-import { isSameDay } from "date-fns";
+import { endOfDay, isSameDay, startOfDay } from "date-fns";
 import TYPES from "@app-repositories/types";
 import UserService from "./UserService";
 import NotificationService from "./NotificationService";
@@ -1139,7 +1139,12 @@ class PostService implements IPostService {
     let matcher: any;
 
     if (isSameDay(new Date(startDate), new Date(endDate))) {
-      matcher = { createdAt: new Date(startDate) };
+      matcher = {
+        createdAt: {
+          $lte: endOfDay(new Date(startDate)),
+          $gte: startOfDay(new Date(startDate)),
+        },
+      };
     } else {
       matcher = {
         $and: [
