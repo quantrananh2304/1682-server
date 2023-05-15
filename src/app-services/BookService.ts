@@ -845,7 +845,7 @@ class BookService implements IBookService {
   ): Promise<BookModelInterface> {
     const user: UserModelInterface = await this.userService.getUserById(actor);
 
-    const book: BookModelInterface = await this.getBookById(bookId);
+    const book: any = await this.getBookById(bookId);
 
     const { like, dislike } = book;
 
@@ -880,7 +880,7 @@ class BookService implements IBookService {
           content: `${user.firstName} ${user.lastName} liked your book ${book.title}`,
           schema: EVENT_SCHEMA.BOOK,
           schemaId: String(book._id),
-          receiver: String(book.createdBy),
+          receiver: String(book.createdBy._id),
           notiType: NOTIFICATION_TYPE.LIKE,
         });
       }
@@ -913,7 +913,7 @@ class BookService implements IBookService {
           content: `${user.firstName} ${user.lastName} disliked your book ${book.title}`,
           schema: EVENT_SCHEMA.BOOK,
           schemaId: String(book._id),
-          receiver: String(book.createdBy),
+          receiver: String(book.createdBy._id),
           notiType: NOTIFICATION_TYPE.DISLIKE,
         });
       }

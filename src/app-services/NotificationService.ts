@@ -5,7 +5,7 @@ import Notifications, {
   NOTIFICATION_TYPE,
   NotificationModelInterface,
 } from "@app-repositories/models/Notifications";
-import { Types } from "mongoose";
+import { Types, isValidObjectId } from "mongoose";
 
 @injectable()
 class NotificationService implements INotificationService {
@@ -15,7 +15,7 @@ class NotificationService implements INotificationService {
       content: string;
       schema: EVENT_SCHEMA;
       schemaId: string;
-      receiver: string;
+      receiver: string | any;
       notiType: NOTIFICATION_TYPE;
     }
   ): Promise<NotificationModelInterface> {
@@ -27,7 +27,9 @@ class NotificationService implements INotificationService {
         schema,
         schemaId: Types.ObjectId(schemaId),
         read: false,
-        receiver: Types.ObjectId(receiver),
+        receiver: isValidObjectId(receiver)
+          ? Types.ObjectId(receiver)
+          : Types.ObjectId(receiver._id),
         notiType,
         createdAt: new Date(),
         updatedAt: new Date(),
