@@ -455,6 +455,18 @@ class UserService implements IUserService {
                           },
                         ],
                       },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$followingUsers.avatar",
+                          {
+                            $indexOfArray: [
+                              "$followingUsers._id",
+                              "$$this.user",
+                            ],
+                          },
+                        ],
+                      },
                     },
                   },
                 ],
@@ -502,6 +514,15 @@ class UserService implements IUserService {
                         $arrayElemAt: [
                           "$followedBy.lastName",
                           { $indexOfArray: ["$followedBy._id", "$$this.user"] },
+                        ],
+                      },
+
+                      avatar: {
+                        $arrayElemAt: [
+                          "$followedBy.avatar",
+                          {
+                            $indexOfArray: ["$followedBy._id", "$$this.user"],
+                          },
                         ],
                       },
                     },
