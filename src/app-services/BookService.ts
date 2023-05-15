@@ -5,7 +5,7 @@ import Books, {
   BookModelInterface,
 } from "@app-repositories/models/Books";
 import { Types } from "mongoose";
-import { isSameDay } from "date-fns";
+import { endOfDay, isSameDay, startOfDay } from "date-fns";
 import TYPES from "@app-repositories/types";
 import NotificationService from "./NotificationService";
 import { EVENT_SCHEMA } from "@app-repositories/models/Events";
@@ -1000,7 +1000,12 @@ class BookService implements IBookService {
     let matcher: any;
 
     if (isSameDay(new Date(startDate), new Date(endDate))) {
-      matcher = { createdAt: new Date(startDate) };
+      matcher = {
+        createdAt: {
+          $gte: startOfDay(new Date(startDate)),
+          $lte: endOfDay(new Date(startDate)),
+        },
+      };
     } else {
       matcher = {
         $and: [
