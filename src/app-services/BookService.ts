@@ -39,7 +39,7 @@ class BookService implements IBookService {
       comments: [],
       topics,
       subscribedUsers: [],
-      hidden: isRegisterForAuthor
+      hidden: !isRegisterForAuthor
         ? {
             isHidden: false,
             hiddenBy: null,
@@ -79,13 +79,14 @@ class BookService implements IBookService {
     filteredBy: {
       topics: Array<string>;
     };
+    isAdmin: boolean;
   }): Promise<{
     books: BookModelInterface[];
     page: number;
     total: number;
     totalPage: number;
   }> {
-    const { page, limit, keyword, filteredBy } = filter;
+    const { page, limit, keyword, filteredBy, isAdmin } = filter;
 
     const skip = page * limit;
 
@@ -172,10 +173,14 @@ class BookService implements IBookService {
       $and: [
         {
           title: { $regex: keyword, $options: "i" },
-          "hidden.isHidden": false,
+          // "hidden.isHidden": false,
         },
       ],
     };
+
+    if (!isAdmin) {
+      matcher.$and["hidden.isHidden"] = false;
+    }
 
     if (filteredBy.topics && filteredBy.topics.length) {
       matcher.$and.push({

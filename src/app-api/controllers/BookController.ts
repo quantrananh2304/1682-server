@@ -78,6 +78,7 @@ class BookController {
 
   async getListBook(req: Request, res: Response) {
     try {
+      const { userRole } = req.headers;
       const { page, limit, sort, keyword, topics } = req.query;
 
       const book = await this.bookService.getListBook({
@@ -86,6 +87,7 @@ class BookController {
         sort,
         keyword: keyword || "",
         filteredBy: { topics: topics || [] },
+        isAdmin: userRole === USER_ROLE.ADMIN,
       });
 
       if (!book) {

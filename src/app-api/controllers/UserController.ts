@@ -990,7 +990,8 @@ class UserController {
           topics,
           price: 0,
         },
-        userId
+        userId,
+        true
       );
 
       if (!book) {

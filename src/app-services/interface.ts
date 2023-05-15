@@ -283,6 +283,7 @@ export interface IBookService {
     filteredBy: {
       topics: Array<string>;
     };
+    isAdmin: boolean;
   }): Promise<{
     books: Array<BookModelInterface>;
     page: number;
